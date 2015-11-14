@@ -1,0 +1,229 @@
+<html>
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+	<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+	<!--<script src="https://code.highcharts.com/mapdata/countries/ca/ca-bc-all.js"></script>-->
+	<script src="/ca-bc-all.js"></script>
+<style >
+	#container {
+	height: 500px;
+	min-width: 310px;
+	max-width: 800px;
+	margin: 0 auto;
+	}
+
+</style>
+</head>
+<body>
+<div id="container"></div>
+
+<script>
+	$(function () {
+
+		// Prepare demo data
+		var data = [
+			{
+				"hc-key": "ca-bc-5917",
+				"value": 0,
+			},
+			{
+				"hc-key": "ca-bc-5924",
+				"value": 1
+			},
+			{
+				"hc-key": "ca-bc-5926",
+				"value": 2
+			},
+			{
+				"hc-key": "ca-bc-5927",
+				"value": 3,
+			},
+			{
+				"hc-key": "ca-bc-5923",
+				"value": 4
+			},
+			{
+				"hc-key": "ca-bc-5929",
+				"value": 5
+			},
+			{
+				"hc-key": "ca-bc-5947",
+				"value": 6
+			},
+			{
+				"hc-key": "ca-bc-5945",
+				"value": 7
+			},
+			{
+				"hc-key": "ca-bc-5943",
+				"value": 8
+			},
+			{
+				"hc-key": "ca-bc-5949",
+				"value": 9
+			},
+			{
+				"hc-key": "ca-bc-5959",
+				"value": 10
+			},
+			{
+				"hc-key": "ca-bc-5955",
+				"value": 11
+			},
+			{
+				"hc-key": "ca-bc-5957",
+				"value": 12
+			},
+			{
+				"hc-key": "ca-bc-5915",
+				"value": 13
+			},
+			{
+				"hc-key": "ca-bc-5921",
+				"value": 14
+			},
+			{
+				"hc-key": "ca-bc-5933",
+				"value": 15
+			},
+			{
+				"hc-key": "ca-bc-5941",
+				"value": 16
+			},
+			{
+				"hc-key": "ca-bc-5953",
+				"value": 17
+			},
+			{
+				"hc-key": "ca-bc-5935",
+				"value": 18
+			},
+			{
+				"hc-key": "ca-bc-5907",
+				"value": 19
+			},
+			{
+				"hc-key": "ca-bc-5939",
+				"value": 20
+			},
+			{
+				"hc-key": "ca-bc-5937",
+				"value": 21
+			},
+			{
+				"hc-key": "ca-bc-5931",
+				"value": 22
+			},
+			{
+				"hc-key": "ca-bc-5919",
+				"value": 23
+			},
+			{
+				"hc-key": "ca-bc-5905",
+				"value": 24
+			},
+			{
+				"hc-key": "ca-bc-5909",
+				"value": 25
+			},
+			{
+				"hc-key": "ca-bc-5951",
+				"value": 26
+			},
+			{
+				"hc-key": "ca-bc-5903",
+				"value": 27
+			},
+			{
+				"hc-key": "ca-bc-5901",
+				"value": 28
+			}
+		];
+
+		function virus(){
+			data.forEach(function(item,index){
+				item.color = "#AC4FE0"
+			})
+		}
+//		function (e) {
+//			e.point.color = '#DD0B20';
+//		}
+
+
+		// Initiate the chart
+		$('#container').highcharts('Map', {
+
+			title : {
+				text : 'BC Zombie'
+			},
+			legend: {
+				enabled: false
+			},
+
+			subtitle : {
+				text : 'Source map: <a href="https://code.highcharts.com/mapdata/countries/ca/ca-bc-all.js">British Columbia</a>'
+			},
+			chart:{
+				height:800 ,
+				borderColor: "#3D39D0",
+				borderWidth: 5
+			},
+			plotOptions: {
+				series: {
+					events: {
+						click: function(e){
+							$('#container').highcharts().series[0].data.forEach(function(item,index){
+								setTimeout(function(){
+									item.update({"color": "#AC4FE0"});
+									$('#container').highcharts().redraw();
+								},index*200);
+
+							});
+
+						}
+					}
+				}
+			},
+			exporting:{
+				buttons:{
+					contextButton:{
+						enabled:false
+					}
+				}
+			},
+			mapNavigation: {
+				enabled: true,
+				buttonOptions: {
+					verticalAlign: 'bottom'
+				}
+			},
+			colors: ['#2EDB37'
+			],
+			series : [{
+				data : data,
+				mapData: Highcharts.maps['countries/ca/ca-bc-all'],
+				joinBy: 'hc-key',
+				name: 'Region Name',
+				borderColor: '#181B52',
+				borderWidth: 0.5,
+				cursor: "pointer",
+				states: {
+					hover: {
+						color: '#DB2D21'
+					},
+				},
+				dataLabels: {
+					enabled: true,
+					format: '{point.name}'
+				},
+
+			}]
+		});
+	});
+
+</script>
+</body>
+
+
+</html>
