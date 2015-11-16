@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>D3 Test</title>
+	<script type="text/javascript" src="d3/d3.min.js"></script>
+	<script src="//d3js.org/topojson.v1.min.js"></script>
+	<style>
+			path{
+				fill:none;
+			  stroke: black;
+			}
+		  .Kootenay{
+			  fill: red ;
+		  }
+		  .Thompson{
+			  fill: yellow;
+		  }
+		  .MainlandSouthwest{
+			 fill:green ;
+		  }
+		  .Vancouver{
+			  fill: #17b9e9;
+		  }
+		  .Cariboo{
+			  fill: #00e713;
+		  }
+		  .North{
+			  fill: #b0f400;
+		  }
+		  .Nechako{
+			  fill: #fb750b;
+		  }
+		  .Northeast{
+			  fill: #b912fa;
+		  }
+	</style>
+</head>
+<body>
+
+<script type="text/javascript">
+	var w = 800;
+	var h = 800;
+	var svg = d3.select("body")
+		.append("svg")
+		.attr("width", w)
+		.attr("height", h)
+		.style("border", "solid 5px black");
+
+	d3.json("bc_withName_topo.json", function(error,map) {
+		if (error) return console.error(error);
+//		console.log(topojson.feature(map, map.objects.bc).feaures);
+		var path = d3.geo.path().projection(null);
+		var featureCollection = topojson.feature(map, map.objects.bc);
+		var bounds = d3.geo.bounds(featureCollection);
+//		var centerX = d3.sum(bounds, function(d) {return d[0];}) / 2,
+//			centerY = d3.sum(bounds, function(d) {return d[1];}) / 2;
+		var projection = d3.geo.conicEquidistant();
+//			.scale(150)
+//			.translate([-10000, -10000]);
+//			.center([centerX, centerY]);
+		var mapJ = svg.selectAll("path")
+			.data(featureCollection.features)
+			.enter()
+			.append("path")
+			.attr("d", path)
+			.attr("class", function(item){
+				return item.properties.NAME;
+			});
+	});
+//	d3.json("BC_boundry.geo.json", function(json){
+//		var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
+//		var path = d3.geo.path().projection(projection);
+////		console.log(json.features);
+//		var map = svg.selectAll("path")
+//			.data(json.features)
+//			.enter()
+//			.append("path")
+//			.attr("d", path)
+//			.style("stroke", "black")
+//			.style("stroke-width", "1px")
+//			.attr("class", function(item){
+//				return item.properties.DR_NAME;
+//			});
+//	});
+</script>
+</body>
+</html>
