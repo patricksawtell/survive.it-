@@ -8,7 +8,12 @@
 	<style>
 			path{
 				fill:none;
-			  stroke: black;
+			  stroke: white;
+				stroke-width: 2px;
+			}
+
+			path:hover{
+				fill: black;
 			}
 		  .Kootenay{
 			  fill: red ;
@@ -47,15 +52,26 @@
 		.attr("height", h)
 		.style("border", "solid 5px black");
 
-	d3.json("bc_withName_topo.json", function(error,map) {
+
+	
+	
+	//	
+	d3.json("bc_crs84.topo.json", function(error,map) {
 		if (error) return console.error(error);
-//		console.log(topojson.feature(map, map.objects.bc).feaures);
-		var path = d3.geo.path().projection(null);
-		var featureCollection = topojson.feature(map, map.objects.bc);
-		var bounds = d3.geo.bounds(featureCollection);
+		var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
+		var path = d3.geo.path().projection(projection);
+		var featureCollection = topojson.feature(map, map.objects.collection);
+//		var bounds = d3.geo.bounds(featureCollection);
+		var b = path.bounds(featureCollection);
+		var s = 0.95 / Math.max(
+				(b[1][0] - b[0][0]) / w,
+				(b[1][1] - b[0][1]) / h
+			);
+		var t = [(w - s * (b[1][0] + b[0][0])) / 2, (h - s * (b[1][1] + b[0][1])) / 2];
 //		var centerX = d3.sum(bounds, function(d) {return d[0];}) / 2,
 //			centerY = d3.sum(bounds, function(d) {return d[1];}) / 2;
-		var projection = d3.geo.conicEquidistant();
+//		var projection = d3.geo.conicEquidistant().scale(s).translate(t);
+
 //			.scale(150)
 //			.translate([-10000, -10000]);
 //			.center([centerX, centerY]);
@@ -65,10 +81,10 @@
 			.append("path")
 			.attr("d", path)
 			.attr("class", function(item){
-				return item.properties.NAME;
+				return item.properties.DR_NAME;
 			});
 	});
-//	d3.json("BC_boundry.geo.json", function(json){
+//	d3.json("bc_crs84.geo.json", function(json){
 //		var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
 //		var path = d3.geo.path().projection(projection);
 ////		console.log(json.features);
