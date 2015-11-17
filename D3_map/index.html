@@ -5,41 +5,50 @@
 	<title>D3 Test</title>
 	<script type="text/javascript" src="d3/d3.min.js"></script>
 	<script src="//d3js.org/topojson.v1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
 	<style>
-		path{
-			fill:none;
+		path {
+			fill: none;
 			stroke: white;
-			stroke-width: 2px;
+			stroke-width: 1 px;
 			font-size: 20px;
 			font-weight: 300;
 			text-anchor: middle;
 		}
 
-		path:hover{
+		path:hover {
 			stroke: black;
 		}
-		.Kootenay{
-			fill: red ;
+
+		.Kootenay {
+			fill: red;
 		}
-		.Thompson_Okanagan{
+
+		.Thompson_Okanagan {
 			fill: yellow;
 		}
-		.Mainland_Southwest{
-			fill:green ;
+
+		.Mainland_Southwest {
+			fill: green;
 		}
-		.Vancouver{
+
+		.Vancouver {
 			fill: #17b9e9;
 		}
-		.Cariboo{
+
+		.Cariboo {
 			fill: #00e713;
 		}
-		.North_Coast{
+
+		.North_Coast {
 			fill: #b0f400;
 		}
-		.Nechako{
+
+		.Nechako {
 			fill: #fb750b;
 		}
-		.Northeast{
+
+		.Northeast {
 			fill: #b912fa;
 		}
 	</style>
@@ -51,56 +60,55 @@
 	var h = 800;
 	var svg = d3.select("body")
 		.append("svg")
-		.attr("width", w)
-		.attr("height", h)
-		.style("border", "solid 5px black");
+		.attr("width", "80%")
+		.attr("height", "80%")
+		.style("border", "solid 5px black")
+		.attr("viewBox", "-1946.9187411654511 -1066.9600480519075 436.297064352382 351.40925503670087");
 
 
-	
 	var color = d3.scale.quantize()
-		.range(["rgb(237,248,233)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"]);
+		.range(["rgb(237,248,233)", "rgb(186,228,179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
 
-	//
-	d3.csv("population.csv", function(data){
+	d3.csv("population.csv", function (data) {
 
 		color.domain([
-			d3.min(data, function(d) { return d.value; }),
-			d3.max(data, function(d) { return d.value; })
+			d3.min(data, function (d) {
+				return d.value;
+			}),
+			d3.max(data, function (d) {
+				return d.value;
+			})
 		]);
 
+//
 
-		d3.json("bc_crs84.topo.json", function(error,map) {
+		d3.json("bc_crs84.topo.json", function (error, map) {
 
-			for(var i = 0; i < data.length; i++){
-
+			for (var i = 0; i < data.length; i++) {
 				var dataRegion = data[i].name;
 				var dataValue = parseFloat(data[i].value);
-				for(var j = 0; j<map.objects.collection.geometries.length; j++){
+				for (var j = 0; j < map.objects.collection.geometries.length; j++) {
 					var mapRegion = map.objects.collection.geometries[j].properties.DR_NAME;
-					if(dataRegion === mapRegion){
+					if (dataRegion === mapRegion) {
 						map.objects.collection.geometries[j].properties.value = dataValue;
-
 						break;
 					}
 				}
 			}
 //.scale(1800).translate([4390, 2400])
 			if (error) return console.error(error);
-			var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
+			var projection = d3.geo.mercator().scale(1000);
 			var path = d3.geo.path().projection(projection);
 			var featureCollection = topojson.feature(map, map.objects.collection);
-
-
-
 			var mapJ = svg.selectAll("path")
 				.data(featureCollection.features)
 				.enter()
 				.append("path")
 				.attr("d", path)
-				.attr("id", function(item){
+				.attr("id", function (item) {
 					return item.properties.DR_NAME;
 				})
-				.style("fill", function(d) {
+				.style("fill", function (d) {
 					//Get data value
 					var value = d.properties.value;
 					if (value) {
@@ -110,46 +118,95 @@
 						//If value is undefined…
 						return "#ccc";
 					}
-				});
-			var cordinaeData = [];
-			var van = document.getElementById("Vancouver").getAttribute('d').slice(1, -1).split('L');
-			var vanCordinate = van.forEach(function(dot, index){
-				cordinaeData[index] = [];
-				var dataSet = dot.split(',');
-				var x = dataSet[0];
-				var y = dataSet[1];
-				cordinaeData[index][0] = parseFloat(dataSet[0]);
-				cordinaeData[index][1] = parseFloat(dataSet[1]);
-			})
-
-			console.log(cordinaeData);
-
-//			svg.selectAll(".subunit-label")
-//				.data(featureCollection.features)
-//				.enter().append("text")
-//				.attr("class", function(d) { return "subunit-label " + d.DR; })
-//				.attr("transform", function(d) { return ; })
-//				.attr("dy", ".35em")
-//				.text("Test");
-
+				})
+				;
+//// Get the min max cordinate
+//			var idArray = [];
+//			var idSet = document.getElementsByTagName('path');
+//
+//			for (key in idSet) {
+//				if (key < 8)
+//					idArray.push(idSet[key].getAttribute('id'));
+//			}
+//			var cordinateData = {};
+//			var maxCordinateData = {};
+//		maxCordinateData['xMax'] = [];
+//		maxCordinateData['yMax'] = {};
+//		maxCordinateData['xMin'] = {};
+//		maxCordinateData['yMin'] = {};
+//		var maxBox = {};
+//
+//
+//
+//			idArray.forEach(function (id, index) {
+//
+//				cordinateData[id] = [];
+//				var unit = document.getElementById(id).getAttribute('d').slice(1, -1).split('L');
+//
+//				unit = _.flatten(unit.map(function (u) {
+//					return u.split('ZM');
+//				}));
+//
+//				var unitCordinate = unit.forEach(function (dot, i, array) {
+//					cordinateData[id][i] = [];
+//					var dataSet = dot.split(',');
+//					var x = parseFloat(dataSet[0]);
+//					var y = parseFloat(dataSet[1]);
+//
+//					cordinateData[id][i][0] = x;
+//					cordinateData[id][i][1] = y;
+//
+//					if (i === array.length - 1) {
+//						var xMax = _.reduce(cordinateData[id], function (max, arr) {
+//							return Math.max(max, arr[0]);
+//						}, -Infinity);
+//						var yMax = _.reduce(cordinateData[id], function (max, arr) {
+//							return Math.max(max, arr[1]);
+//						}, -Infinity);
+//						var xMin = _.reduce(cordinateData[id], function (min, arr) {
+//							return Math.min(min, arr[0]);
+//						}, Infinity);
+//						var yMin = _.reduce(cordinateData[id], function (min, arr) {
+//							return Math.min(min, arr[1]);
+//						}, Infinity);
+//						maxCordinateData['xMax'][id] = xMax;
+//						maxCordinateData['yMax'][id] = yMax;
+//						maxCordinateData['xMin'][id] = xMin;
+//						maxCordinateData['yMin'][id] = yMin;
+//					}
+//
+//				});
+//
+//			});
+//			for(k in maxCordinateData){
+//				if (k === 'xMax'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var xMax = Math.max.apply( null, arr );
+//					maxBox.xMax = xMax;
+//				}
+//				else if(k === 'yMax'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var yMax = Math.max.apply( null, arr );
+//					maxBox.yMax = yMax;
+//				}
+//				else if(k === 'xMin'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var xMin = Math.min.apply( null, arr );
+//					maxBox.xMin = xMin;
+//				}
+//				else if(k === 'yMin'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var yMin = Math.min.apply( null, arr );
+//					maxBox.yMin = yMin;
+//				}
+//			}
+//			console.log(maxBox);
+//			// Get the min max cordinate
 		});
 	});
 
-	//	d3.json("bc_crs84.geo.json", function(json){
-	//		var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
-	//		var path = d3.geo.path().projection(projection);
-	////		console.log(json.features);
-	//		var map = svg.selectAll("path")
-	//			.data(json.features)
-	//			.enter()
-	//			.append("path")
-	//			.attr("d", path)
-	//			.style("stroke", "black")
-	//			.style("stroke-width", "1px")
-	//			.attr("class", function(item){
-	//				return item.properties.DR_NAME;
-	//			});
-	//	});
+
+
 </script>
 </body>
 </html>
