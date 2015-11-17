@@ -6,39 +6,42 @@
 	<script type="text/javascript" src="d3/d3.min.js"></script>
 	<script src="//d3js.org/topojson.v1.min.js"></script>
 	<style>
-			path{
-				fill:none;
-			  stroke: white;
-				stroke-width: 2px;
-			}
+		path{
+			fill:none;
+			stroke: white;
+			stroke-width: 2px;
+			font-size: 20px;
+			font-weight: 300;
+			text-anchor: middle;
+		}
 
-			path:hover{
-				fill: black;
-			}
-		  .Kootenay{
-			  fill: red ;
-		  }
-		  .Thompson{
-			  fill: yellow;
-		  }
-		  .MainlandSouthwest{
-			 fill:green ;
-		  }
-		  .Vancouver{
-			  fill: #17b9e9;
-		  }
-		  .Cariboo{
-			  fill: #00e713;
-		  }
-		  .North{
-			  fill: #b0f400;
-		  }
-		  .Nechako{
-			  fill: #fb750b;
-		  }
-		  .Northeast{
-			  fill: #b912fa;
-		  }
+		path:hover{
+			stroke: black;
+		}
+		.Kootenay{
+			fill: red ;
+		}
+		.Thompson_Okanagan{
+			fill: yellow;
+		}
+		.Mainland_Southwest{
+			fill:green ;
+		}
+		.Vancouver{
+			fill: #17b9e9;
+		}
+		.Cariboo{
+			fill: #00e713;
+		}
+		.North_Coast{
+			fill: #b0f400;
+		}
+		.Nechako{
+			fill: #fb750b;
+		}
+		.Northeast{
+			fill: #b912fa;
+		}
 	</style>
 </head>
 <body>
@@ -54,51 +57,99 @@
 
 
 	
-	
-	//	
-	d3.json("bc_crs84.topo.json", function(error,map) {
-		if (error) return console.error(error);
-		var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
-		var path = d3.geo.path().projection(projection);
-		var featureCollection = topojson.feature(map, map.objects.collection);
-//		var bounds = d3.geo.bounds(featureCollection);
-		var b = path.bounds(featureCollection);
-		var s = 0.95 / Math.max(
-				(b[1][0] - b[0][0]) / w,
-				(b[1][1] - b[0][1]) / h
-			);
-		var t = [(w - s * (b[1][0] + b[0][0])) / 2, (h - s * (b[1][1] + b[0][1])) / 2];
-//		var centerX = d3.sum(bounds, function(d) {return d[0];}) / 2,
-//			centerY = d3.sum(bounds, function(d) {return d[1];}) / 2;
-//		var projection = d3.geo.conicEquidistant().scale(s).translate(t);
+	var color = d3.scale.quantize()
+		.range(["rgb(237,248,233)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"]);
 
-//			.scale(150)
-//			.translate([-10000, -10000]);
-//			.center([centerX, centerY]);
-		var mapJ = svg.selectAll("path")
-			.data(featureCollection.features)
-			.enter()
-			.append("path")
-			.attr("d", path)
-			.attr("class", function(item){
-				return item.properties.DR_NAME;
-			});
+	//
+	d3.csv("population.csv", function(data){
+
+		color.domain([
+			d3.min(data, function(d) { return d.value; }),
+			d3.max(data, function(d) { return d.value; })
+		]);
+
+
+		d3.json("bc_crs84.topo.json", function(error,map) {
+
+			for(var i = 0; i < data.length; i++){
+
+				var dataRegion = data[i].name;
+				var dataValue = parseFloat(data[i].value);
+				for(var j = 0; j<map.objects.collection.geometries.length; j++){
+					var mapRegion = map.objects.collection.geometries[j].properties.DR_NAME;
+					if(dataRegion === mapRegion){
+						map.objects.collection.geometries[j].properties.value = dataValue;
+
+						break;
+					}
+				}
+			}
+//.scale(1800).translate([4390, 2400])
+			if (error) return console.error(error);
+			var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
+			var path = d3.geo.path().projection(projection);
+			var featureCollection = topojson.feature(map, map.objects.collection);
+
+
+
+			var mapJ = svg.selectAll("path")
+				.data(featureCollection.features)
+				.enter()
+				.append("path")
+				.attr("d", path)
+				.attr("id", function(item){
+					return item.properties.DR_NAME;
+				})
+				.style("fill", function(d) {
+					//Get data value
+					var value = d.properties.value;
+					if (value) {
+						//If value exists…
+						return color(value);
+					} else {
+						//If value is undefined…
+						return "#ccc";
+					}
+				});
+			var cordinaeData = [];
+			var van = document.getElementById("Vancouver").getAttribute('d').slice(1, -1).split('L');
+			var vanCordinate = van.forEach(function(dot, index){
+				cordinaeData[index] = [];
+				var dataSet = dot.split(',');
+				var x = dataSet[0];
+				var y = dataSet[1];
+				cordinaeData[index][0] = parseFloat(dataSet[0]);
+				cordinaeData[index][1] = parseFloat(dataSet[1]);
+			})
+
+			console.log(cordinaeData);
+
+//			svg.selectAll(".subunit-label")
+//				.data(featureCollection.features)
+//				.enter().append("text")
+//				.attr("class", function(d) { return "subunit-label " + d.DR; })
+//				.attr("transform", function(d) { return ; })
+//				.attr("dy", ".35em")
+//				.text("Test");
+
+		});
 	});
-//	d3.json("bc_crs84.geo.json", function(json){
-//		var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
-//		var path = d3.geo.path().projection(projection);
-////		console.log(json.features);
-//		var map = svg.selectAll("path")
-//			.data(json.features)
-//			.enter()
-//			.append("path")
-//			.attr("d", path)
-//			.style("stroke", "black")
-//			.style("stroke-width", "1px")
-//			.attr("class", function(item){
-//				return item.properties.DR_NAME;
-//			});
-//	});
+
+	//	d3.json("bc_crs84.geo.json", function(json){
+	//		var projection = d3.geo.mercator().scale(1800).translate([4390, 2400]);
+	//		var path = d3.geo.path().projection(projection);
+	////		console.log(json.features);
+	//		var map = svg.selectAll("path")
+	//			.data(json.features)
+	//			.enter()
+	//			.append("path")
+	//			.attr("d", path)
+	//			.style("stroke", "black")
+	//			.style("stroke-width", "1px")
+	//			.attr("class", function(item){
+	//				return item.properties.DR_NAME;
+	//			});
+	//	});
 </script>
 </body>
 </html>
