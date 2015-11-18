@@ -74,7 +74,10 @@
 
 
 	//The neighbor region reference
+	var idName;
 	var neighborNames;
+	//The region's status of outbreak
+	var regionStatuts;
 
 	//Load the csv file to D3
 	d3.csv("population.csv", function (data) {
@@ -87,7 +90,7 @@
 				return d.value;
 			})
 		]);
-	//Load the json file to D3
+		//Load the json file to D3
 		d3.json("bc_crs84.topo.json", function (error, map) {
 			//mapping the csv data to map!!
 			for (var i = 0; i < data.length; i++) {
@@ -114,7 +117,7 @@
 				return name.properties.DR_NAME;
 			};
 			//Get the neighbor reference list (In region name)
-			var idName = geometries.map(getGeoName);
+			idName = geometries.map(getGeoName);
 			var neighbors = topojson.neighbors(geometries);
 			var nameMap = function (geoIndex) {
 				return getGeoName(geometries[geoIndex]);
@@ -126,25 +129,31 @@
 			}, {});
 			//Drawing the map
 			var mapJ = svg.selectAll("path")
-				.data(featureCollection.features)
-				.enter()
-				.append("path")
-				.attr("d", path)
-				.attr("id", function (item) {
-					return item.properties.DR_NAME;
-				})
-				.style("fill", function (d) {
-					//Get data value
-					var value = d.properties.value;
-					if (value) {
-						//If value exists…
-						return color(value);
-					} else {
-						//If value is undefined…
-						return "#ccc";
-					}
-				})
+					.data(featureCollection.features)
+					.enter()
+					.append("path")
+					.attr("d", path)
+					.attr("id", function (item) {
+						return item.properties.DR_NAME;
+					})
+					.style("fill", function (d) {
+						//Get data value
+						var value = d.properties.value;
+						if (value) {
+							//If value exists…
+							return color(value);
+						} else {
+							//If value is undefined…
+							return "#ccc";
+						}
+					})
 				;
+
+			//Assign the outbreak status of each regions
+			regionStatuts = idName.reduce(function(pre, current, index){
+				pre[current]= false ;
+				return pre;
+			},{});
 //// Get the min max cordinate
 //			var idArray = [];
 //			var idSet = document.getElementsByTagName('path');
@@ -230,20 +239,30 @@
 		});
 	});
 
-$(function(){
+
+		$(function(){
 //When click the region, change the current region and neighbor regions
-	$('svg').on('click','path', function(){
-		d3.select(this).style('fill', 'red');
-		var currentRegion =  $(this).attr('id');
-		var currentNeighbors = neighborNames[currentRegion];
-		console.log(currentNeighbors);
-		currentNeighbors.forEach(function(region){
-			d3.selectAll('#'+region).style('fill', 'red');
-		})
-	})
+		$('svg').on('click','path', function(){
+			var currentRegion =  $(this).attr('id');
+			var currentNeighbors = function(currentRegion){
+				return neighborNames[currentRegion];
+			};
+			d3.select(this).style('fill', 'red');
+			regionStatuts[currentRegion] = true;
+			var propagation = function(target){
+				setTimeout(function(){
+					currentNeighbors(target).forEach(function(region){
+						d3.selectAll('#'+region).style('fill', 'red');
+						regionStatuts[region] = true;
+					})
+				}, 1000)
+			};
+
+			propagation(currentRegion);
+		});
 
 
-});
+	});
 
 
 
