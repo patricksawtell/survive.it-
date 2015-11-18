@@ -66,7 +66,7 @@
 		.attr("width", "80%")
 		.attr("height", "80%")
 		.style("border", "solid 5px black")
-		.attr("viewBox", "-1946.9187411654511 -1066.9600480519075 436.297064352382 351.40925503670087");
+		.attr("viewBox", "-2432 -1330 530 500");
 
 	//Create a color scale for different value of regions
 	var color = d3.scale.quantize()
@@ -109,7 +109,7 @@
 			if (error) return console.error(error);
 
 			//Set the projection and the path setting
-			var projection = d3.geo.mercator().scale(1000);
+			var projection = d3.geo.mercator().scale(1200);
 			var path = d3.geo.path().projection(projection);
 			var featureCollection = topojson.feature(map, map.objects.collection);
 			var geometries = map.objects.collection.geometries;
@@ -149,93 +149,35 @@
 					})
 				;
 
+			// calculate bounding box coordinate
+			var result = {};
+			var regions = $('svg path').toArray()
+				.map(function(region) {
+					return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+						var pairs = s.split(',');
+						return pairs.map(function (n) {
+
+							return parseFloat(n);
+						});
+					});
+				});
+
+			var allCoordinates = _.flatten(regions);
+			result.minX = _.min(allCoordinates, function(coordinate) { return coordinate[0] })[0];
+			result.minY = _.min(allCoordinates, function(coordinate) { return coordinate[1] })[1];
+			result.maxX = _.max(allCoordinates, function(coordinate) { return coordinate[0] })[0];
+			result.maxY = _.max(allCoordinates, function(coordinate) { return coordinate[1] })[1];
+			result.width =  result.maxX - result.minX;
+			result.height = result.maxY - result.minY;
+			
+			console.log('result', result)
+
 			//Assign the outbreak status of each regions
 			regionStatuts = idName.reduce(function(pre, current, index){
 				pre[current]= false ;
 				return pre;
 			},{});
-//// Get the min max cordinate
-//			var idArray = [];
-//			var idSet = document.getElementsByTagName('path');
 //
-//			for (key in idSet) {
-//				if (key < 8)
-//					idArray.push(idSet[key].getAttribute('id'));
-//			}
-//			var cordinateData = {};
-//			var maxCordinateData = {};
-//		maxCordinateData['xMax'] = [];
-//		maxCordinateData['yMax'] = {};
-//		maxCordinateData['xMin'] = {};
-//		maxCordinateData['yMin'] = {};
-//		var maxBox = {};
-//
-//
-//
-//			idArray.forEach(function (id, index) {
-//
-//				cordinateData[id] = [];
-//				var unit = document.getElementById(id).getAttribute('d').slice(1, -1).split('L');
-//
-//				unit = _.flatten(unit.map(function (u) {
-//					return u.split('ZM');
-//				}));
-//
-//				var unitCordinate = unit.forEach(function (dot, i, array) {
-//					cordinateData[id][i] = [];
-//					var dataSet = dot.split(',');
-//					var x = parseFloat(dataSet[0]);
-//					var y = parseFloat(dataSet[1]);
-//
-//					cordinateData[id][i][0] = x;
-//					cordinateData[id][i][1] = y;
-//
-//					if (i === array.length - 1) {
-//						var xMax = _.reduce(cordinateData[id], function (max, arr) {
-//							return Math.max(max, arr[0]);
-//						}, -Infinity);
-//						var yMax = _.reduce(cordinateData[id], function (max, arr) {
-//							return Math.max(max, arr[1]);
-//						}, -Infinity);
-//						var xMin = _.reduce(cordinateData[id], function (min, arr) {
-//							return Math.min(min, arr[0]);
-//						}, Infinity);
-//						var yMin = _.reduce(cordinateData[id], function (min, arr) {
-//							return Math.min(min, arr[1]);
-//						}, Infinity);
-//						maxCordinateData['xMax'][id] = xMax;
-//						maxCordinateData['yMax'][id] = yMax;
-//						maxCordinateData['xMin'][id] = xMin;
-//						maxCordinateData['yMin'][id] = yMin;
-//					}
-//
-//				});
-//
-//			});
-//			for(k in maxCordinateData){
-//				if (k === 'xMax'){
-//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
-//					var xMax = Math.max.apply( null, arr );
-//					maxBox.xMax = xMax;
-//				}
-//				else if(k === 'yMax'){
-//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
-//					var yMax = Math.max.apply( null, arr );
-//					maxBox.yMax = yMax;
-//				}
-//				else if(k === 'xMin'){
-//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
-//					var xMin = Math.min.apply( null, arr );
-//					maxBox.xMin = xMin;
-//				}
-//				else if(k === 'yMin'){
-//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
-//					var yMin = Math.min.apply( null, arr );
-//					maxBox.yMin = yMin;
-//				}
-//			}
-//			console.log(maxBox);
-//			// Get the min max cordinate
 		});
 	});
 
@@ -260,7 +202,6 @@
 
 			propagation(currentRegion);
 		});
-
 
 	});
 
