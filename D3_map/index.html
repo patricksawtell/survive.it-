@@ -6,6 +6,7 @@
 	<script type="text/javascript" src="d3/d3.min.js"></script>
 	<script src="//d3js.org/topojson.v1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<style>
 		path {
 			fill: none;
@@ -56,6 +57,8 @@
 <body>
 
 <script type="text/javascript">
+
+	// Create SVG element
 	var w = 800;
 	var h = 800;
 	var svg = d3.select("body")
@@ -65,10 +68,15 @@
 		.style("border", "solid 5px black")
 		.attr("viewBox", "-1946.9187411654511 -1066.9600480519075 436.297064352382 351.40925503670087");
 
-
+	//Create a color scale for different value of regions
 	var color = d3.scale.quantize()
 		.range(["rgb(237,248,233)", "rgb(186,228,179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
 
+
+	//The neighbor region reference
+	var neighborNames;
+
+	//Load the csv file to D3
 	d3.csv("population.csv", function (data) {
 
 		color.domain([
@@ -79,11 +87,9 @@
 				return d.value;
 			})
 		]);
-
-//
-
+	//Load the json file to D3
 		d3.json("bc_crs84.topo.json", function (error, map) {
-
+			//mapping the csv data to map!!
 			for (var i = 0; i < data.length; i++) {
 				var dataRegion = data[i].name;
 				var dataValue = parseFloat(data[i].value);
@@ -95,11 +101,30 @@
 					}
 				}
 			}
-//.scale(1800).translate([4390, 2400])
+
+
 			if (error) return console.error(error);
+
+			//Set the projection and the path setting
 			var projection = d3.geo.mercator().scale(1000);
 			var path = d3.geo.path().projection(projection);
 			var featureCollection = topojson.feature(map, map.objects.collection);
+			var geometries = map.objects.collection.geometries;
+			var getGeoName = function (name) {
+				return name.properties.DR_NAME;
+			};
+			//Get the neighbor reference list (In region name)
+			var idName = geometries.map(getGeoName);
+			var neighbors = topojson.neighbors(geometries);
+			var nameMap = function (geoIndex) {
+				return getGeoName(geometries[geoIndex]);
+			};
+			neighborNames = neighbors.reduce(function (valuesSoFar, currentValue, index) {
+				var name = idName[index];
+				valuesSoFar[name] = currentValue.map(nameMap);
+				return valuesSoFar;
+			}, {});
+			//Drawing the map
 			var mapJ = svg.selectAll("path")
 				.data(featureCollection.features)
 				.enter()
@@ -204,6 +229,21 @@
 //			// Get the min max cordinate
 		});
 	});
+
+$(function(){
+//When click the region, change the current region and neighbor regions
+	$('svg').on('click','path', function(){
+		d3.select(this).style('fill', 'red');
+		var currentRegion =  $(this).attr('id');
+		var currentNeighbors = neighborNames[currentRegion];
+		console.log(currentNeighbors);
+		currentNeighbors.forEach(function(region){
+			d3.selectAll('#'+region).style('fill', 'red');
+		})
+	})
+
+
+});
 
 
 
