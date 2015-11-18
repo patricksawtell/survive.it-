@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Survive.it</title>
+    <link rel="stylesheet" href="css/app.css">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu:400,500,700' rel='stylesheet' type='text/css'>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
+    <script src="javascript/popup.js"></script>
+    <script src="javascript/jquery.typist.js"></script>
+    <script src="javascript/main.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+  	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+  	<script src="D3_map/node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="D3_map/d3/d3.min.js"></script>
+      <script type="text/javascript" src="javascript/map.js"></script>
+  </head>
+
+<div class="container">
+  <div id="boxes">
+    <div id="dialog" class="window">
+      <p class="typist"></p>
+      <div id="popupfoot">
+        <button class="btn-popup">Vancouver</button>
+        <button class="btn-popup">Prince George</button>
+        <button class="btn-popup">Whistler</button>
+      </div>
+    </div>
+    <div id="mask"></div>
+  </div>
+    <div class = "main">
+      <div id = "side-nav">
+        <h3 id="filter">Toggle Filters</h3>
+        <ul class="tg-list">
+          <li class="tg-list-item btn-green">
+            <p>Population</p>
+              <input type="checkbox" class="tgl tgl-flat" id="cb1">
+              <label class="tgl-btn" for ="cb1"></label>
+          </li>
+
+        <li class="tg-list-item btn-blue">
+          <p>Hospitals</p>
+            <input type="checkbox" class="tgl tgl-flat" id="cb2">
+            <label class="tgl-btn" for ="cb2"></label>
+        </li>
+
+        <li class="tg-list-item btn-purple">
+          <p>Bears</p>
+          <input type="checkbox" class="tgl tgl-flat" id="cb3">
+          <label class="tgl-btn" for ="cb3"></label>
+        </li>
+        <li class="tg-list-item btn-red">
+          <p>Wildlife</p>
+          <input type="checkbox" class="tgl tgl-flat" id="cb4">
+          <label class="tgl-btn" for ="cb4"></label>
+        </li>
+      </ul>
+    </div>
+      <div id="map">
+        <script type="text/javascript" src="javascript/map.js"></script>
+    </div>
+</div>
+</body>
+</html>

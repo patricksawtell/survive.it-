@@ -1,0 +1,153 @@
+.btn-popup
+  margin: 5px
+  border-radius: 5px
+  padding: 10px
+  font-size: 12px
+  display: inline-block
+  color: #e74c3c
+  border: 2px #e74c3c solid
+  background: none
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+
+.btn-popup:hover
+  color: #fff
+  background: #e74c3c
+  text-shadow: 0 1px 1px rgba(0,0,0,.3)
+  border-radius: .5em
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+
+
+.btn-green
+  padding: 5px
+  font-size: 12px
+  display: inline-block
+  color: white
+  background: #0a893f
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+  // @include linear-gradient(#0a893f, #53AC78)
+
+
+.btn-green:hover
+  background: #91D772
+  text-shadow: 0 1px 1px rgba(0,0,0,.3)
+  border: 2px #91D772 solid
+  border-radius: .5em
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+  transform: scale(1.1)
+
+.btn-green.filter
+  opacity: 0.5
+  transform: scale(1.1)
+
+.btn-blue
+  padding: 5px
+  font-size: 12px
+  display: inline-block
+  color: white
+  background: #263748
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+
+.btn-blue:hover
+  background: #515E6C
+  text-shadow: 0 1px 1px rgba(0,0,0,.3)
+  border: 2px #515E6C solid
+  border-radius: .5em
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+  transform: scale(1.1)
+
+.btn-purple
+  padding: 5px
+  font-size: 12px
+  display: inline-block
+  color: white
+  background: #48365C
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+
+
+.btn-purple:hover
+  background: #916CB8
+  text-shadow: 0 1px 1px rgba(0,0,0,.3)
+  border: 2px #916CB8 solid
+  border-radius: .5em
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+  transform: scale(1.1)
+
+.btn-red
+  padding: 5px
+  border-bottom-left-radius: .5em
+  border-bottom-right-radius: .5em
+  font-size: 12px
+  display: inline-block
+  color: white
+  background: #943644
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+
+.btn-red:hover
+  background: #A95E69
+  text-shadow: 0 1px 1px rgba(0,0,0,.3)
+  border: 2px #A95E69 solid
+  border-radius: .5em
+  box-shadow: 0 1px 2px rgba(0,0,0,.2)
+  transform: scale(1.1)
+
+ul, li
+  list-style: none
+  margin: 0
+  padding: 0
+
+.tgl
+  display: none
+  // add default box-sizing for this scope
+  &, &:after, &:before,
+  & *, & *:after, & *:before,
+  & + .tgl-btn
+    box-sizing: border-box
+    &::selection
+      background: none
+
+  + .tgl-btn
+    outline: 0
+    display: block
+    width: 2em
+    height: 1em
+    position: relative
+    cursor: pointer
+      user-select: none
+    &:after, &:before
+      position: relative
+      display: block
+      content: ""
+      width: 50%
+      height: 100%
+
+    &:after
+      left: 0
+
+    &:before
+      display: none
+
+
+  &:checked
+    + .tgl-btn
+      &:after
+        left: 50%
+
+.tgl-flat
+  + .tgl-btn
+    padding: 2px
+    transition: all .2s ease
+    border: 1.5px solid #f2f2f2
+    border-radius: 2em
+    &:after
+      transition: all .2s ease
+      background: #f2f2f2
+      content: ""
+      border-radius: 1em
+
+
+  &:checked
+    + .tgl-btn
+      border: 1.5px solid
+      &:after
+        left: 50%
+        background: #16D051

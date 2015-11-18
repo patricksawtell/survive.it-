@@ -1,0 +1,32 @@
+@import "_button"
+
+#mask
+  position: absolute
+  left: 0
+  top: 0
+  z-index: 9000
+  background-color: #000
+  display: none
+
+#boxes .window
+  position: absolute
+  left: 0
+  top: 0
+  +size (440px 200px)
+  display: none
+  z-index: 9999
+  padding: 20px
+  border-radius: 15px
+  text-align: center
+
+#boxes #dialog
+  +size (350px 150px)
+  padding: 10px
+  font-size: 15pt
+  color: white
+
+#popupfoot
+  font-size: 16pt
+  position: relative
+  bottom: 0px
+  width: 300px
