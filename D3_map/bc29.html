@@ -6,47 +6,82 @@
 	<script type="text/javascript" src="d3/d3.min.js"></script>
 	<script src="//d3js.org/topojson.v1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<style>
+		path {
+			fill: none;
+			stroke: black;
+			stroke-width: 2px;
+			font-size: 20px;
+			font-weight: 300;
+			text-anchor: middle;
+		}
+
+	</style>
 </head>
 <body>
 <script>
+	$(function(){
+		var svg = d3.select("body")
+			.append("svg")
+			.attr("width", 500)
+			.attr("height", 500)
+			.style("border", "solid 5px black")
+			.attr("viewBox", "-3160 -1725 655 527");
 
-	var svg = d3.select("body")
-		.append("svg")
-		.attr("width", "80%")
-		.attr("height", "80%")
-		.style("border", "solid 5px black")
-		.attr("viewBox", "-1946.9187411654511 -1066.9600480519075 436.297064352382 351.40925503670087");
 
-	d3.csv("RegionsBC.csv", function (csv) {
-
-		d3.json("bc_29.topo.json", function(map) {
-			debugger
-			var projection = d3.geo.mercator().scale(1000);
+		d3.json("bc29.topo.json", function(map) {
+			var projection = d3.geo.mercator().scale(2000);
 			var path = d3.geo.path().projection(projection);
-			var featureCollection = topojson.feature(map, map.objects.collection);
-			var neighbors = topojson.neighbors(map.objects.collection.geometries);
+			var featureCollection = topojson.feature(map, map.objects.bc_29_crs84);
+			var neighbors = topojson.neighbors(map.objects.bc_29_crs84.geometries);
 			var mapJ = svg.selectAll("path")
 				.data(featureCollection.features)
 				.enter()
 				.append("path")
 				.attr("d", path)
-				.attr("id", function (item) {
-					return item.properties.DR_NAME;
+				.attr("class", function (item) {
+					return item.properties.CDNAME;
 				})
-				.style("fill", function (d) {
-					//Get data value
-					var value = d.properties.value;
-					if (value) {
-						//If value exists…
-						return color(value);
-					} else {
-						//If value is undefined…
-						return "#ccc";
+				.attr("id", function (item) {
+					return item.properties.CSDNAME;
+				});
+			// calculate bounding box coordinate
+			var result = {};
+			var regions = $('svg path').toArray()
+				.map(function(region) {
+					if(region.getAttribute('d')) {
+						return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+							var pairs = s.split(',');
+							return pairs.map(function (n) {
+								return parseFloat(n);
+							});
+						});
+					}else{
+
 					}
 				});
 
+			var allCoordinates = _.flatten(regions);
+			result.minX = _.min(allCoordinates, function(coordinate) { return coordinate[0] })[0];
+			result.minY = _.min(allCoordinates, function(coordinate) { return coordinate[1] })[1];
+			result.maxX = _.max(allCoordinates, function(coordinate) { return coordinate[0] })[0];
+			result.maxY = _.max(allCoordinates, function(coordinate) { return coordinate[1] })[1];
+			result.width =  result.maxX - result.minX;
+			result.height = result.maxY - result.minY;
+
+			var viewBox = result.minX +' '+ result.minY + ' ' + result.width + ' ' +result.height;
+
+			$('svg').each(function () { $(this)[0].setAttribute('viewBox', viewBox) });
 		});
+
+		//The neighbor region reference
+		var idName;
+		var neighborNames;
+		//The region's status of outbreak
+		var regionStatuts;
 	});
+
 </script>
 </body>
 </html>
