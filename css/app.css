@@ -1,0 +1,220 @@
+html {
+  box-sizing: border-box; }
+
+*, *::after, *::before {
+  box-sizing: inherit; }
+
+.btn-popup {
+  margin: 5px;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 12px;
+  display: inline-block;
+  color: #e74c3c;
+  border: 2px #e74c3c solid;
+  background: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+
+.btn-popup:hover {
+  color: #fff;
+  background: #e74c3c;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  border-radius: 0.5em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+
+.btn-home {
+  padding: 5px;
+  font-size: 12px;
+  display: inline-block;
+  color: white; }
+
+.btn-home:hover {
+  background: #e74c3c;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  border: 2px #e74c3c solid;
+  border-radius: 0.5em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transform: scale(1.1); }
+
+ul, li {
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+
+li.toggle {
+  border-top: 1px dotted white; }
+
+.tgl {
+  display: none; }
+  .tgl, .tgl:after, .tgl:before, .tgl *, .tgl *:after, .tgl *:before, .tgl + .tgl-btn {
+    box-sizing: border-box; }
+    .tgl::selection, .tgl:after::selection, .tgl:before::selection, .tgl *::selection, .tgl *:after::selection, .tgl *:before::selection, .tgl + .tgl-btn::selection {
+      background: none; }
+  .tgl + .tgl-btn {
+    outline: 0;
+    display: block;
+    width: 2em;
+    height: 1em;
+    position: relative;
+    cursor: pointer;
+      cursor-user-select: none; }
+    .tgl + .tgl-btn:after, .tgl + .tgl-btn:before {
+      position: relative;
+      display: block;
+      content: "";
+      width: 50%;
+      height: 100%; }
+    .tgl + .tgl-btn:after {
+      left: 0; }
+    .tgl + .tgl-btn:before {
+      display: none; }
+  .tgl:checked + .tgl-btn:after {
+    left: 50%; }
+
+.tgl-flat + .tgl-btn {
+  padding: 2px;
+  transition: all 0.2s ease;
+  border: 1.5px solid #f2f2f2;
+  border-radius: 2em; }
+  .tgl-flat + .tgl-btn:after {
+    transition: all 0.2s ease;
+    background: #f2f2f2;
+    content: "";
+    border-radius: 1em; }
+.tgl-flat:checked + .tgl-btn {
+  border: 1.5px solid; }
+  .tgl-flat:checked + .tgl-btn:after {
+    left: 50%;
+    background: #7CCC63; }
+
+#mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 9000;
+  background-color: #000; }
+
+#boxes .window {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 200px;
+  width: 440px;
+  display: none;
+  z-index: 9999;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center; }
+
+#boxes #dialog {
+  height: 150px;
+  width: 350px;
+  padding: 10px;
+  font-size: 15pt;
+  color: white; }
+
+#popupfoot {
+  font-size: 16pt;
+  position: relative;
+  bottom: 0px;
+  width: 300px; }
+
+path {
+  fill: none;
+  stroke: white;
+  stroke-width: 1 px;
+  font-size: 20px;
+  font-weight: 300;
+  text-anchor: middle; }
+
+path:hover {
+  stroke: pink; }
+
+path.tooltip {
+  display: inline;
+  position: relative;
+  background: yellow; }
+
+.Kootenay {
+  fill: #BCBDC9; }
+
+.Thompson_Okanagan {
+  fill: #83848C; }
+
+.Mainland_Southwest {
+  fill: #E6E6E8; }
+
+.Vancouver {
+  fill: #737374; }
+
+.Cariboo {
+  fill: #5C5C5C; }
+
+.North_Coast {
+  fill: #DEDEDE; }
+
+.Nechako {
+  fill: #2C2C2C; }
+
+.Northeast {
+  fill: #6B6B6B; }
+
+body {
+  font: 100% font-stack;
+  background: black; }
+
+.container {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto; }
+  .container::after {
+    clear: both;
+    content: "";
+    display: table; }
+  .container::after {
+    clear: both;
+    content: "";
+    display: table; }
+
+.main {
+  height: 700px;
+  width: 700px;
+  float: left;
+  display: block;
+  margin-right: 2.35765%;
+  width: 100%;
+  background: black; }
+  .main:last-child {
+    margin-right: 0; }
+
+#side-nav {
+  margin: 5px;
+  border: solid 1px white;
+  border-radius: 10px;
+  background: rgba(54, 25, 25, 0.5);
+  float: left;
+  display: block;
+  margin-right: 2.35765%;
+  width: 14.70196%;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+  #side-nav:last-child {
+    margin-right: 0; }
+  #side-nav .tg-list .tg-list-item {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; }
+    #side-nav .tg-list .tg-list-item p {
+      flex: 7;
+      margin: 3px; }
+    #side-nav .tg-list .tg-list-item label {
+      flex: 0 0 30px;
+      margin-right: 8px; }
+
+#filter {
+  text-align: center;
+  color: #e74c3c;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3); }
+
+/*# sourceMappingURL=app.css.map */
