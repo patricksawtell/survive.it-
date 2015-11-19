@@ -9,37 +9,45 @@
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<style>
 		path {
-			fill: white;
-			stroke: black;
+			fill: #a6a6a6;
+			stroke: white;
 			stroke-width: 2px;
 			font-size: 20px;
 			font-weight: 300;
 			text-anchor: middle;
 		}
 
+		svg {
+			background-color:#005F80;
+		}
+
 	</style>
 </head>
 <body>
 <script>
+	var width = 500;
+	var height = 500;
 	var regionsData = {};
 	var svg = d3.select("body")
 		.append("svg")
-		.attr("width", 500)
-		.attr("height", 500)
+		.attr("width", width)
+		.attr("height", height)
 		.style("border", "solid 5px black")
 		.attr("viewBox", "-3160 -1725 655 527");
 	var neighborNames;
-	d3.csv("RegionsBC.csv", function (data) {
+	var centered;
 
+
+	d3.csv("RegionsBC.csv", function (data) {
 		d3.json("bc29.topo.json", function (map) {
 
 			//Initialize the region data in hash
-			var geometries =map.objects.bc_29_crs84.geometries;
-			geometries.forEach(function(region){
+			var geometries = map.objects.bc_29_crs84.geometries;
+			geometries.forEach(function (region) {
 				var name = region.properties.CDNAME;
 				regionsData[name] = {};
 				regionsData[name]['infectStatus'] = false;
-			})
+			});
 
 
 			//Store the csv data into hash
@@ -47,11 +55,13 @@
 				var regionName = data[i].Name;
 				var regionValue = parseFloat(data[i].Population);
 				regionsData[regionName]['populatoin'] = regionValue;
-			};
+			}
 
 			//Draw the map
-			var projection = d3.geo.mercator().scale(2000);
+			var projection = d3.geo.mercator().scale(5000);
 			var path = d3.geo.path().projection(projection);
+			var ali = 'ali';
+
 			var featureCollection = topojson.feature(map, map.objects.bc_29_crs84);
 			var neighbors = topojson.neighbors(map.objects.bc_29_crs84.geometries);
 			var mapJ = svg.selectAll("path")
@@ -61,10 +71,12 @@
 				.attr("d", path)
 				.attr("id", function (item) {
 					return item.properties.CDNAME;
-				});
+				})
+				.on('click', clicked);
+
 			// calculate bounding box coordinate
-			var result = {};
-			var regions = $('svg path').toArray()
+			var regions = $('svg path')
+				.toArray()
 				.map(function (region) {
 					if (region.getAttribute('d')) {
 						return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
@@ -73,32 +85,49 @@
 								return parseFloat(n);
 							});
 						});
-					} else {
-
 					}
 				});
 			var allCoordinates = _.flatten(regions);
-			result.minX = _.min(allCoordinates, function (coordinate) {
-				return coordinate[0]
-			})[0];
-			result.minY = _.min(allCoordinates, function (coordinate) {
-				return coordinate[1]
-			})[1];
-			result.maxX = _.max(allCoordinates, function (coordinate) {
-				return coordinate[0]
-			})[0];
-			result.maxY = _.max(allCoordinates, function (coordinate) {
-				return coordinate[1]
-			})[1];
-			result.width = result.maxX - result.minX;
-			result.height = result.maxY - result.minY;
 
-			var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
+			function getBoundingBox(Coordinates) {
+				var result = {};
+				result.minX = _.min(Coordinates, function (coordinate) {
+					return coordinate[0]
+				})[0];
+				result.minY = _.min(Coordinates, function (coordinate) {
+					return coordinate[1]
+				})[1];
+				result.maxX = _.max(Coordinates, function (coordinate) {
+					return coordinate[0]
+				})[0];
+				result.maxY = _.max(Coordinates, function (coordinate) {
+					return coordinate[1]
+				})[1];
+				result.width = result.maxX - result.minX;
+				result.height = result.maxY - result.minY;
+				var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
+				return viewBox;
+			}
+			//calculate single bounding box of region
+			$('svg path').toArray().forEach(function(region, index){
+				if (region.getAttribute('d')) {
+						var regionName = region.getAttribute('id');
+						var coordinates = region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+							var pairs = s.split(',');
+							return pairs.map(function (n) {
+								return parseFloat(n);
+							});
+						});
+					coordinates = getBoundingBox(coordinates);
+							regionsData[regionName]['bbox'] = coordinates;
+					}
+				});
 
+			//Set the view Box
+			var viewBox = getBoundingBox(allCoordinates);
 			$('svg').each(function () {
 				$(this)[0].setAttribute('viewBox', viewBox)
 			});
-
 
 			//Get the neighbor reference list (In region name)
 			var getGeoName = function (name) {
@@ -115,34 +144,49 @@
 				return valuesSoFar;
 			}, {});
 
+			//Click event
+			function clicked(d){
+				if (d && centered !== d) {
+					centered = d;
+					var regionName = d.properties.CDNAME;
+					$('svg').each(function () {
+						$(this)[0].setAttribute('viewBox', regionsData[regionName]['bbox']);
+					});
+				} else {
+					centered = null;
+					$('svg').each(function () {
+						$(this)[0].setAttribute('viewBox', viewBox)
+					});
+				}
+
+			}
 
 		});
 	});
-//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
+	//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 	$(function () {
-		$('svg').on('click','path', function(){
+		$('svg').on('click', 'path', function () {
 
 			console.log($(this).attr('id'));
 
-			var currentRegion =  $(this).attr('id');
-			var currentNeighbors = function(currentRegion){
+			var currentRegion = $(this).attr('id');
+			var currentNeighbors = function (currentRegion) {
 				return neighborNames[currentRegion];
 			};
 
 			d3.select(this).style('fill', 'red');
 
 			regionsData[currentRegion].infectStatus = true;
-			var propagation = function(target){
-				setTimeout(function(){
-					currentNeighbors(target).forEach(function(region){
-						d3.select('#'+region).style('fill', 'red');
+			var propagation = function (target) {
+				setTimeout(function () {
+					currentNeighbors(target).forEach(function (region) {
+						d3.select('#' + region).style('fill', 'red');
 						regionsData[region].infectStatus = true;
 					})
 				}, 1000)
 			};
 			propagation(currentRegion);
 		});
-
 	});
 
 </script>
