@@ -1,53 +1,60 @@
 $(document).ready(function() {
-var id = '#dialog';
+  showDialogue();
 
-//Get the screen height and width
-var maskHeight = $(document).height();
-var maskWidth = $(window).width();
 
-//Set heigth and width to mask to fill up the whole screen
-$('#mask').css({'width':maskWidth,'height':maskHeight});
+  var id = '#dialog';
 
-//transition effect
-$('#mask').fadeIn(500);
-$('#mask').fadeTo("slow",0.9);
+  //Get the screen height and width
+  var maskHeight = $(document).height();
+  var maskWidth = $(window).width();
 
-//Get the window height and width
-var winH = $(window).height();
-var winW = $(window).width();
+  //Set heigth and width to mask to fill up the whole screen
+  $('#mask').css({'width':maskWidth,'height':maskHeight});
 
-//Set the popup window to center
-$(id).css('top',  winH/2-$(id).height()/2);
-$(id).css('left', winW/2-$(id).width()/2);
+  //transition effect
+  $('#mask').fadeIn(500);
+  $('#mask').fadeTo("slow",0.9);
 
-//transition effect
-$(id).fadeIn(2000);
+  //Get the window height and width
+  var winH = $(window).height();
+  var winW = $(window).width();
 
-//if close button is clicked
-$('.window .close').click(function (e) {
-//Cancel the link behavior
-e.preventDefault();
+  //Set the popup window to center
+  $(id).css('top',  winH/2-$(id).height()/2);
+  $(id).css('left', winW/2-$(id).width()/2);
 
-$('#mask').hide();
-$('.window').hide();
-});
+  //transition effect
+  $(id).fadeIn(2000);
 
-//if mask is clicked
-$('#mask').click(function () {
-$(this).hide();
-$('.window').hide();
-});
+  //if close button is clicked
+  $('.window .close').click(function (e) {
+    //Cancel the link behavior
+    e.preventDefault();
 
-$('.typist').typist({ speed: 12 })
-.typistPause(2000) // 3 sec
-.typistAdd('Hello? Are you there?\n')
-.typistPause(2000) // 2 sec
-.typistAdd('Something is wrong.\n')
-.typistPause(2000) // 2 sec
-.typistAdd('Very wrong!!\n')
-.typistPause(2000)
-.typistAdd('You need to get somewhere safe. They\'re coming!\n')
-.typistPause(1000)
-.typistAdd('Hurry! Where will you go?\n');
+    $('#mask').hide();
+    $('.window').hide();
+  });
+
+  //if mask is clicked
+  $('#mask').click(function () {
+    $(this).hide();
+    $('.window').hide();
+  });
+
+  function showDialogue(){
+    $("#popupfoot").hide()
+    $('.typist').typist({ speed: 12 })
+    .typistPause(2000) // 3 sec
+    .typistAdd('Hello? Are you there?\n', function() {
+      $("#popupfoot").fadeIn("slow");
+    })
+    // .typistPause(2000) // 2 sec
+    // .typistAdd('Something is very wrong!!!!\n')
+    // .typistPause(2000) // 2 sec
+    // .typistAdd('You gotta get out of there. They\'re coming!\n')
+    // .typistPause(1000)
+    // .typistAdd('Hurry!')
+    .typistStop();
+  }
 
 });

@@ -7,9 +7,6 @@ body
   font: 100% font-stack
   background: black
 
-li
-  list-style: none
-
 .container
   +clearfix
   +outer-container(100%)
@@ -17,10 +14,11 @@ li
 .main
   +size(700px)
   @include span-columns(12)
+  background: black
 
 #side-nav
   margin: 5px
-  border: solid 2px white
+  border: solid 1px white
   border-radius: 10px
   background: rgba(54, 25, 25, .5)
   @include span-columns(2)
@@ -41,20 +39,5 @@ li
 
 #filter
   text-align: center
-  color: white
-
-.test
-  display: inline-block
-
-.btn-menu
-  margin: 5px
-  font-size: 22px
-
-.btn-menu:hover
-  color: red
-  transform: scale(1.1)
-
-.btn-menu.filter
-  color: red
-  opacity: 0.5
-  transform: scale(1.1)
+  color: #e74c3c
+  text-shadow: 0 1px 1px rgba(0,0,0,.3)

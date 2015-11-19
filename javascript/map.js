@@ -115,4 +115,8 @@ d3.csv("population.csv", function (data) {
     propagation(currentRegion);
   });
 
+  function tooltip(){
+    $('path').addClass('tooltip');
+  };
+
 });
