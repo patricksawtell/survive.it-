@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>D3 Test</title>
+	<script type="text/javascript" src="d3/d3.min.js"></script>
+	<script src="//d3js.org/topojson.v1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<!--<script src="d3.carto.map.js" type="text/javascript"></script>-->
+	<style>
+		path {
+			fill: none;
+			stroke: white;
+			stroke-width: 1 px;
+			font-size: 20px;
+			font-weight: 300;
+			text-anchor: middle;
+		}
+
+		path:hover {
+			stroke: black;
+		}
+
+		.Kootenay {
+			fill: red;
+		}
+
+		.Thompson_Okanagan {
+			fill: yellow;
+		}
+
+		.Mainland_Southwest {
+			fill: green;
+		}
+
+		.Vancouver {
+			fill: #17b9e9;
+		}
+
+		.Cariboo {
+			fill: #00e713;
+		}
+
+		.North_Coast {
+			fill: #b0f400;
+		}
+
+		.Nechako {
+			fill: #fb750b;
+		}
+
+		.Northeast {
+			fill: #b912fa;
+		}
+	</style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+	// Create SVG element
+	var w = 800;
+	var h = 800;
+
+	var svg = d3.select("body")
+		.append("svg")
+		.attr("width", "80%")
+		.attr("height", "80%")
+		.style("border", "solid 5px black")
+		.attr("viewBox", "-1946.9187411654511 -1066.9600480519075 436.297064352382 351.40925503670087");
+
+  var g = svg.append("g").attr("id", "paths");
+  var hospitalLayer = svg.append("g").attr("id", "hospital");
+
+	//The neighbor region reference
+	var idName;
+	var neighborNames;
+	//The region's status of outbreak
+	var regionStatuts;
+
+	var colorSets = [
+		["rgb(237,248,233)", "rgb(186,228,179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]
+	];
+
+	var colors = {};
+
+	//Load the csv file to D3
+	d3.csv("population.csv", function (data)
+	{
+		var properties = _.chain(data).head().omit('name').keys().value();
+
+//		var properties = Object.keys(data[0]).filter(function(prop) { return prop != 'name'; }); // Vanilla
+
+
+
+		properties.forEach(function(property, idx)
+		{
+			colors[property] = d3.scale.quantize()
+				.range(colorSets[idx % colorSets.length])
+				.domain([
+					d3.min(data, function(d) { return d[property]; }),
+					d3.max(data, function(d) { return d[property]; })
+				]);
+		});
+
+    colors.infection = d3.scale.linear().domain([0, 100]).range(['#fff', '#f00'])
+
+
+//		//Load the json file to D3
+		d3.json("bc_crs84.topo.json", function (error, topo) {
+			if (error) return console.error(error);
+//      console.log(topo);
+
+//			//mapping the csv data to map!!
+      var neighbors = topojson.neighbors(topo.objects.collection.geometries);
+			var geometries = data.map(function(region, idx, coll)
+      {
+				var geometry = _.find(topo.objects.collection.geometries, function(p)
+        {
+					return p.properties.DR_NAME == region.name;
+				});
+        var processedRegion = _.map(region, function(val, key)
+        {
+          geometry.properties[key] = (key !== 'name') ? parseFloat(val) : val;
+        });
+        geometry.properties.neighbours = neighbors[idx].map(function(idx)
+        {
+          return coll[idx].name;
+        })
+        .filter(function(name) { return name !== region.name; });
+				return topojson.feature(topo, geometry);
+			});
+
+//			//Drawing the map
+
+      function getGeoName(name) { return name.properties.DR_NAME };
+
+      function colorForProp(prop, def)
+      {
+        return function(region)
+        {
+          if(!region.properties[prop]) { return def || '#ccc' }
+          return colors[prop](region.properties[prop]);
+        }
+      }
+
+      function findByName(name)
+      {
+        return _.find(geometries, function(region) { return region.properties.name === name; })
+      }
+
+      var projection = d3.geo.mercator().scale(1000);
+      var path = d3.geo.path().projection(projection);
+
+
+      hospitalLayer.selectAll("path")
+        .data(geometries)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("id", getGeoName)
+        .style("fill", colorForProp('hospital', '#faa'));
+
+
+      g.selectAll("path")
+        .data(geometries)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("id", getGeoName)
+        .style("fill", colorForProp('population', '#faa'))
+        .on('click', function onRegionClick(region)
+        {
+          region.properties.infection += 10;
+//          console.log(region.properties.infection)
+          d3.select(this).style('fill', colors.infection(region.properties.infection));
+          region.properties.neighbours.map(findByName).forEach(function(neighbourRegion)
+          {
+            neighbourRegion.properties.infection += (region.properties.infection / 20);
+            console.log(region.properties.infection, neighbourRegion.properties.infection);
+            var path  = d3.select('path[id=' + neighbourRegion.properties.name + ']');
+            path.style('fill', colors.infection(neighbourRegion.properties.infection));
+//
+          });
+        })
+      ;
+
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      window.redraw = function redraw(prop)
+      {
+        svg.selectAll("path")
+                .data(geometries)
+                .style("fill", colorForProp(prop, '#ccc'));
+      };
+
+//      setInterval(function()
+//      {
+//        var region = geometries[getRandomInt(0, geometries.length - 1)];
+//        region.properties.infection += 10;
+//        region.properties.neighbours.map(findByName).forEach(function(neighbourRegion)
+//        {
+//          neighbourRegion.properties.infection += (region.properties.infection / 20);
+//        });
+//        redraw('infection');
+//      }, 500);
+//
+    });
+
+			//Assign the outbreak status of each regions
+//			regionStatuts = idName.reduce(function(pre, current, index){
+//				pre[current]= false ;
+//				return pre;
+//			},{});
+//// Get the min max cordinate
+//			var idArray = [];
+//			var idSet = document.getElementsByTagName('path');
+//
+//			for (key in idSet) {
+//				if (key < 8)
+//					idArray.push(idSet[key].getAttribute('id'));
+//			}
+//			var cordinateData = {};
+//			var maxCordinateData = {};
+//		maxCordinateData['xMax'] = [];
+//		maxCordinateData['yMax'] = {};
+//		maxCordinateData['xMin'] = {};
+//		maxCordinateData['yMin'] = {};
+//		var maxBox = {};
+//
+//
+//
+//			idArray.forEach(function (id, index) {
+//
+//				cordinateData[id] = [];
+//				var unit = document.getElementById(id).getAttribute('d').slice(1, -1).split('L');
+//
+//				unit = _.flatten(unit.map(function (u) {
+//					return u.split('ZM');
+//				}));
+//
+//				var unitCordinate = unit.forEach(function (dot, i, array) {
+//					cordinateData[id][i] = [];
+//					var dataSet = dot.split(',');
+//					var x = parseFloat(dataSet[0]);
+//					var y = parseFloat(dataSet[1]);
+//
+//					cordinateData[id][i][0] = x;
+//					cordinateData[id][i][1] = y;
+//
+//					if (i === array.length - 1) {
+//						var xMax = _.reduce(cordinateData[id], function (max, arr) {
+//							return Math.max(max, arr[0]);
+//						}, -Infinity);
+//						var yMax = _.reduce(cordinateData[id], function (max, arr) {
+//							return Math.max(max, arr[1]);
+//						}, -Infinity);
+//						var xMin = _.reduce(cordinateData[id], function (min, arr) {
+//							return Math.min(min, arr[0]);
+//						}, Infinity);
+//						var yMin = _.reduce(cordinateData[id], function (min, arr) {
+//							return Math.min(min, arr[1]);
+//						}, Infinity);
+//						maxCordinateData['xMax'][id] = xMax;
+//						maxCordinateData['yMax'][id] = yMax;
+//						maxCordinateData['xMin'][id] = xMin;
+//						maxCordinateData['yMin'][id] = yMin;
+//					}
+//
+//				});
+//
+//			});
+//			for(k in maxCordinateData){
+//				if (k === 'xMax'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var xMax = Math.max.apply( null, arr );
+//					maxBox.xMax = xMax;
+//				}
+//				else if(k === 'yMax'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var yMax = Math.max.apply( null, arr );
+//					maxBox.yMax = yMax;
+//				}
+//				else if(k === 'xMin'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var xMin = Math.min.apply( null, arr );
+//					maxBox.xMin = xMin;
+//				}
+//				else if(k === 'yMin'){
+//					var arr = Object.keys( maxCordinateData[k] ).map(function ( key ) { return maxCordinateData[k][key]; });
+//					var yMin = Math.min.apply( null, arr );
+//					maxBox.yMin = yMin;
+//				}
+//			}
+//			console.log(maxBox);
+//			// Get the min max cordinate
+
+//	});
+
+
+//      $(function()
+//      {
+//      //When click the region, change the current region and neighbor regions
+//      $('svg').on('click','path', function(){
+//        var currentRegion =  $(this).attr('id');
+//        var currentNeighbors = function(currentRegion){
+//          return neighborNames[currentRegion];
+//        };
+//        d3.select(this).style('fill', 'red');
+//        regionStatuts[currentRegion] = true;
+//        var propagation = function(target){
+//          setTimeout(function(){
+//            currentNeighbors(target).forEach(function(region){
+//              d3.selectAll('#'+region).style('fill', 'red');
+//              regionStatuts[region] = true;
+//            })
+//          }, 1000)
+//        };
+//
+//        propagation(currentRegion);
+//      });
+
+
+//	  });
+  });
+
+
+
+</script>
+</body>
+</html>
