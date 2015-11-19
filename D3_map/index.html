@@ -9,7 +9,6 @@
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<style>
 		path {
-			fill: none;
 			stroke: white;
 			stroke-width: 1 px;
 			font-size: 20px;
@@ -169,7 +168,7 @@
 			result.maxY = _.max(allCoordinates, function(coordinate) { return coordinate[1] })[1];
 			result.width =  result.maxX - result.minX;
 			result.height = result.maxY - result.minY;
-			
+
 			console.log('result', result)
 
 			//Assign the outbreak status of each regions

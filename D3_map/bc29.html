@@ -4,12 +4,12 @@
 	<meta charset="UTF-8">
 	<title>TEst 29 region</title>
 	<script type="text/javascript" src="d3/d3.min.js"></script>
-	<script src="//d3js.org/topojson.v1.min.js"></script>
+	<script src="node_modules/topojson/topojson.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<style>
 		path {
-			fill: none;
+			fill: white;
 			stroke: black;
 			stroke-width: 2px;
 			font-size: 20px;
@@ -21,16 +21,35 @@
 </head>
 <body>
 <script>
-	$(function(){
-		var svg = d3.select("body")
-			.append("svg")
-			.attr("width", 500)
-			.attr("height", 500)
-			.style("border", "solid 5px black")
-			.attr("viewBox", "-3160 -1725 655 527");
+	var regionsData = {};
+	var svg = d3.select("body")
+		.append("svg")
+		.attr("width", 500)
+		.attr("height", 500)
+		.style("border", "solid 5px black")
+		.attr("viewBox", "-3160 -1725 655 527");
+	var neighborNames;
+	d3.csv("RegionsBC.csv", function (data) {
+
+		d3.json("bc29.topo.json", function (map) {
+
+			//Initialize the region data in hash
+			var geometries =map.objects.bc_29_crs84.geometries;
+			geometries.forEach(function(region){
+				var name = region.properties.CDNAME;
+				regionsData[name] = {};
+				regionsData[name]['infectStatus'] = false;
+			})
 
 
-		d3.json("bc29.topo.json", function(map) {
+			//Store the csv data into hash
+			for (var i = 0; i < data.length; i++) {
+				var regionName = data[i].Name;
+				var regionValue = parseFloat(data[i].Population);
+				regionsData[regionName]['populatoin'] = regionValue;
+			};
+
+			//Draw the map
 			var projection = d3.geo.mercator().scale(2000);
 			var path = d3.geo.path().projection(projection);
 			var featureCollection = topojson.feature(map, map.objects.bc_29_crs84);
@@ -40,46 +59,89 @@
 				.enter()
 				.append("path")
 				.attr("d", path)
-				.attr("class", function (item) {
-					return item.properties.CDNAME;
-				})
 				.attr("id", function (item) {
-					return item.properties.CSDNAME;
+					return item.properties.CDNAME;
 				});
 			// calculate bounding box coordinate
 			var result = {};
 			var regions = $('svg path').toArray()
-				.map(function(region) {
-					if(region.getAttribute('d')) {
+				.map(function (region) {
+					if (region.getAttribute('d')) {
 						return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
 							var pairs = s.split(',');
 							return pairs.map(function (n) {
 								return parseFloat(n);
 							});
 						});
-					}else{
+					} else {
 
 					}
 				});
-
 			var allCoordinates = _.flatten(regions);
-			result.minX = _.min(allCoordinates, function(coordinate) { return coordinate[0] })[0];
-			result.minY = _.min(allCoordinates, function(coordinate) { return coordinate[1] })[1];
-			result.maxX = _.max(allCoordinates, function(coordinate) { return coordinate[0] })[0];
-			result.maxY = _.max(allCoordinates, function(coordinate) { return coordinate[1] })[1];
-			result.width =  result.maxX - result.minX;
+			result.minX = _.min(allCoordinates, function (coordinate) {
+				return coordinate[0]
+			})[0];
+			result.minY = _.min(allCoordinates, function (coordinate) {
+				return coordinate[1]
+			})[1];
+			result.maxX = _.max(allCoordinates, function (coordinate) {
+				return coordinate[0]
+			})[0];
+			result.maxY = _.max(allCoordinates, function (coordinate) {
+				return coordinate[1]
+			})[1];
+			result.width = result.maxX - result.minX;
 			result.height = result.maxY - result.minY;
 
-			var viewBox = result.minX +' '+ result.minY + ' ' + result.width + ' ' +result.height;
+			var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
 
-			$('svg').each(function () { $(this)[0].setAttribute('viewBox', viewBox) });
+			$('svg').each(function () {
+				$(this)[0].setAttribute('viewBox', viewBox)
+			});
+
+
+			//Get the neighbor reference list (In region name)
+			var getGeoName = function (name) {
+				return name.properties.CDNAME;
+			};
+			var idName = geometries.map(getGeoName);
+			var neighbors = topojson.neighbors(geometries);
+			var nameMap = function (geoIndex) {
+				return getGeoName(geometries[geoIndex]);
+			};
+			neighborNames = neighbors.reduce(function (valuesSoFar, currentValue, index) {
+				var name = idName[index];
+				valuesSoFar[name] = currentValue.map(nameMap);
+				return valuesSoFar;
+			}, {});
+
+			//Propagation of neighhbor regions
+			var regionStatuts;
+
+		});
+	});
+//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
+	$(function () {
+		$('svg').on('click','path', function(){
+
+			var currentRegion =  $(this).attr('id');
+			var currentNeighbors = function(currentRegion){
+				return neighborNames[currentRegion];
+			};
+			d3.select(this).style('fill', 'red');
+
+			regionsData[currentRegion].infectStatus = true;
+			var propagation = function(target){
+				setTimeout(function(){
+					currentNeighbors(target).forEach(function(region){
+						d3.selectAll('#'+region).style('fill', 'red');
+						regionsData[region].infectStatus = true;
+					})
+				}, 1000)
+			};
+			propagation(currentRegion);
 		});
 
-		//The neighbor region reference
-		var idName;
-		var neighborNames;
-		//The region's status of outbreak
-		var regionStatuts;
 	});
 
 </script>
