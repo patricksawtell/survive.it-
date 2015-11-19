@@ -115,8 +115,6 @@
 				return valuesSoFar;
 			}, {});
 
-			//Propagation of neighhbor regions
-			var regionStatuts;
 
 		});
 	});
@@ -124,17 +122,20 @@
 	$(function () {
 		$('svg').on('click','path', function(){
 
+			console.log($(this).attr('id'));
+
 			var currentRegion =  $(this).attr('id');
 			var currentNeighbors = function(currentRegion){
 				return neighborNames[currentRegion];
 			};
+
 			d3.select(this).style('fill', 'red');
 
 			regionsData[currentRegion].infectStatus = true;
 			var propagation = function(target){
 				setTimeout(function(){
 					currentNeighbors(target).forEach(function(region){
-						d3.selectAll('#'+region).style('fill', 'red');
+						d3.select('#'+region).style('fill', 'red');
 						regionsData[region].infectStatus = true;
 					})
 				}, 1000)
