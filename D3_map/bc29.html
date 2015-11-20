@@ -21,11 +21,54 @@
 			background-color:#005F80;
 		}
 
+		.clouds{
+			height: 500px;
+			width: 500px;
+			background-image:  url('https://dl.dropboxusercontent.com/u/32750720/cloud-1.png'), url('https://dl.dropboxusercontent.com/u/32750720/cloud-2.png');
+			background-position:
+			0 100%,
+			100% 0;
+			background-repeat: no-repeat;
+			position: absolute;
+			top: 0; left: 0; right: 0; bottom: 0;
+			margin: auto;
+			transform:
+			translateZ(50px);
+			pointer-events: none;
+			animation: cloud-rotate-h 160s linear infinite;
+			transition: all 5s;
+
+		}
+
+		@keyframes cloud-rotate-h {
+			0% {
+				transform:
+				translateZ(50px)
+				rotate(0deg);
+			}
+			50% {
+				transform:
+				translateZ(50px)
+				rotate(180deg);
+				width: 60%;
+			}
+			100% {
+				transform:
+				translateZ(50px)
+				rotate(360deg);
+			}
+		}
+
+		svg{
+			position: absolute;
+			top: 0; left: 0; right: 0; bottom: 0;
+			margin: auto;
+		}
+
 	</style>
 </head>
 <body>
-<div class="clouds">
-</div>
+
 <script>
 
 	//Set some SVG default value and some data will be use globally
@@ -76,6 +119,9 @@
 				})
 				.on('click', clicked);
 
+			$('<div>').addClass('clouds').appendTo($('body'));
+
+
 			// calculate bounding box coordinate
 			var regions = $('svg path')
 				.toArray()
@@ -107,7 +153,10 @@
 				})[1];
 				result.width = result.maxX - result.minX;
 				result.height = result.maxY - result.minY;
-				var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
+				var marginW = result.width * 0.1;
+				var marginH = result.height * 0.1;
+
+				var viewBox = (result.minX - marginW) + ' ' + (result.minY - marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
 				return viewBox;
 			}
 			//calculate single bounding box of region
@@ -163,6 +212,7 @@
 	});
 	//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 	$(function () {
+
 		$('svg').on('click', 'path', function () {
 
 			console.log($(this).attr('id'));
