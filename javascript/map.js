@@ -3,11 +3,12 @@ var svg = d3.select("#map")
   .append("svg")
   .attr("width", 600)
   .attr("height", 600)
+  .style("border", "solid 5px white")
   .attr("viewBox", "-3160 -1725 655 527");
 
 var neighborNames;
+var centered;
 d3.csv("RegionsBC.csv", function (data) {
-
   d3.json("bc29.topo.json", function (map) {
 
     //Initialize the region data in hash
@@ -55,7 +56,8 @@ d3.csv("RegionsBC.csv", function (data) {
       .attr("id", function (item) {
         return item.properties.CDNAME;
       })
-      .on("mouseover", mouseOver).on("mouseout", mouseOut);
+      .on("mouseover", mouseOver).on("mouseout", mouseOut)
+      .on('click', clicked);
 
 
   var toolTip =   function tooltipHtml(d, population){
@@ -66,38 +68,55 @@ d3.csv("RegionsBC.csv", function (data) {
        toolTip();
 
     // calculate bounding box coordinate
-    var result = {};
     var regions = $('svg path').toArray()
-      .map(function (region) {
-        if (region.getAttribute('d')) {
-          return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
-            var pairs = s.split(',');
-            return pairs.map(function (n) {
-              return parseFloat(n);
-            });
-          });
-        } else {
-
-        }
+ 				.map(function (region) {
+ 					if (region.getAttribute('d')) {
+ 						return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+ 							var pairs = s.split(',');
+ 							return pairs.map(function (n) {
+ 								return parseFloat(n);
+ 							});
+ 						});
+          }
       });
     var allCoordinates = _.flatten(regions);
-    result.minX = _.min(allCoordinates, function (coordinate) {
-      return coordinate[0]
-    })[0];
-    result.minY = _.min(allCoordinates, function (coordinate) {
-      return coordinate[1]
-    })[1];
-    result.maxX = _.max(allCoordinates, function (coordinate) {
-      return coordinate[0]
-    })[0];
-    result.maxY = _.max(allCoordinates, function (coordinate) {
-      return coordinate[1]
-    })[1];
-    result.width = result.maxX - result.minX;
-    result.height = result.maxY - result.minY;
+    function getBoundingBox(Coordinates) {
+				var result = {};
+				result.minX = _.min(Coordinates, function (coordinate) {
+					return coordinate[0]
+				})[0];
+				result.minY = _.min(Coordinates, function (coordinate) {
+				return coordinate[1]
+				})[1];
+				result.maxX = _.max(Coordinates, function (coordinate) {
+					return coordinate[0]
+				})[0];
+				result.maxY = _.max(Coordinates, function (coordinate) {
+					return coordinate[1]
+				})[1];
+				result.width = result.maxX - result.minX;
+				result.height = result.maxY - result.minY;
+				var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
+				return viewBox;
+			}
 
-    var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
+			//calculate single bounding box of region
+			$('svg path').toArray().forEach(function(region, index){
+				if (region.getAttribute('d')) {
+						var regionName = region.getAttribute('id');
+						var coordinates = region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+							var pairs = s.split(',');
+							return pairs.map(function (n) {
+								return parseFloat(n);
+							});
+						});
+					coordinates = getBoundingBox(coordinates);
+							regionsData[regionName]['bbox'] = coordinates;
+					}
+				});
 
+		//Set the view Box
+		var viewBox = getBoundingBox(allCoordinates);
     $('svg').each(function () {
       $(this)[0].setAttribute('viewBox', viewBox)
     });
@@ -117,6 +136,23 @@ d3.csv("RegionsBC.csv", function (data) {
       valuesSoFar[name] = currentValue.map(nameMap);
       return valuesSoFar;
     }, {});
+
+    //Click event
+    function clicked(d){
+      if (d && centered !== d) {
+        centered = d;
+        var regionName = d.properties.CDNAME;
+        $('svg').each(function () {
+          $(this)[0].setAttribute('viewBox', regionsData[regionName]['bbox']);
+        });
+      } else {
+        centered = null;
+        $('svg').each(function () {
+          $(this)[0].setAttribute('viewBox', viewBox)
+        });
+      }
+
+    }
 
 
   });
