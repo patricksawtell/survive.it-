@@ -120,44 +120,53 @@ li.toggle {
   width: 300px; }
 
 path {
-  fill: none;
-  stroke: white;
-  stroke-width: 1 px;
+  fill: white;
+  stroke: black;
+  stroke-width: 2px;
   font-size: 20px;
   font-weight: 300;
   text-anchor: middle; }
 
 path:hover {
-  stroke: pink; }
+  stroke: green; }
 
-path.tooltip {
-  display: inline;
-  position: relative;
-  background: yellow; }
+#tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 20px;
+  margin: 10px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 1px;
+  border-radius: 2px;
+  pointer-events: none; }
 
-.Kootenay {
-  fill: #BCBDC9; }
+#tooltip h4 {
+  margin: 0;
+  font-size: 14px; }
 
-.Thompson_Okanagan {
-  fill: #83848C; }
+#tooltip {
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid grey;
+  border-radius: 5px;
+  font-size: 12px;
+  width: auto;
+  padding: 4px;
+  color: white;
+  opacity: 0; }
 
-.Mainland_Southwest {
-  fill: #E6E6E8; }
+#tooltip table {
+  table-layout: fixed; }
 
-.Vancouver {
-  fill: #737374; }
+#tooltip tr td {
+  padding: 0;
+  margin: 0; }
 
-.Cariboo {
-  fill: #5C5C5C; }
+#tooltip tr td:nth-child(1) {
+  width: 50px; }
 
-.North_Coast {
-  fill: #DEDEDE; }
-
-.Nechako {
-  fill: #2C2C2C; }
-
-.Northeast {
-  fill: #6B6B6B; }
+#tooltip tr td:nth-child(2) {
+  text-align: center; }
 
 body {
   font: 100% font-stack;
@@ -182,9 +191,18 @@ body {
   float: left;
   display: block;
   margin-right: 2.35765%;
-  width: 100%;
-  background: black; }
+  width: 100%; }
   .main:last-child {
+    margin-right: 0; }
+
+#map {
+  float: left;
+  display: block;
+  margin-right: 2.35765%;
+  width: 74.41059%;
+  height: 400px;
+  width: 400px; }
+  #map:last-child {
     margin-right: 0; }
 
 #side-nav {
@@ -211,6 +229,16 @@ body {
     #side-nav .tg-list .tg-list-item label {
       flex: 0 0 30px;
       margin-right: 8px; }
+
+#info-box {
+  float: left;
+  display: block;
+  margin-right: 2.35765%;
+  width: 23.23176%;
+  border: 2px yellow solid;
+  float: right; }
+  #info-box:last-child {
+    margin-right: 0; }
 
 #filter {
   text-align: center;

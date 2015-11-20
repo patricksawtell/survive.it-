@@ -14,7 +14,11 @@ body
 .main
   +size(700px)
   @include span-columns(12)
-  background: black
+
+
+#map
+  @include span-columns(9)
+  +size(400px)
 
 #side-nav
   margin: 5px
@@ -36,6 +40,11 @@ body
       label
         flex: 0 0 30px
         margin-right: 8px
+
+#info-box
+  @include span-columns(3)
+  border: 2px yellow solid
+  float: right
 
 #filter
   text-align: center

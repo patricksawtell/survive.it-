@@ -1,59 +1,113 @@
-// Create SVG element
+var regionsData = {};
 var svg = d3.select("#map")
   .append("svg")
-  .attr("width", "80%")
-  .attr("height", "80%")
-  .attr("viewBox", "-1946.9187411654511 -1066.9600480519075 436.297064352382 351.40925503670087");
+  .attr("width", 600)
+  .attr("height", 600)
+  .attr("viewBox", "-3160 -1725 655 527");
 
-//Create a color scale for different value of regions
-var color = d3.scale.quantize()
-  .range(["#6B6B6B", "#BCBDC9", "#2C2C2C", "#DEDEDE", "#5C5C5C", "#737374", "#E6E6E8", "#83848C" ]);
-
-
-//The neighbor region reference
-var idName;
 var neighborNames;
-//The region's status of outbreak
-var regionStatuts;
+d3.csv("RegionsBC.csv", function (data) {
 
-//Load the csv file to D3
-d3.csv("population.csv", function (data) {
+  d3.json("bc29.topo.json", function (map) {
 
-  color.domain([
-    d3.min(data, function (d) {
-      return d.value;
-    }),
-    d3.max(data, function (d) {
-      return d.value;
+    //Initialize the region data in hash
+    var geometries =map.objects.bc_29_crs84.geometries;
+    geometries.forEach(function(region){
+      var name = region.properties.CDNAME;
+      regionsData[name] = {};
+      regionsData[name]['infectStatus'] = false;
     })
-  ]);
-  //Load the json file to D3
-  d3.json("bc_crs84.topo.json", function (error, map) {
-    //mapping the csv data to map!!
-    for (var i = 0; i < data.length; i++) {
-      var dataRegion = data[i].name;
-      var dataValue = parseFloat(data[i].value);
-      for (var j = 0; j < map.objects.collection.geometries.length; j++) {
-        var mapRegion = map.objects.collection.geometries[j].properties.DR_NAME;
-        if (dataRegion === mapRegion) {
-          map.objects.collection.geometries[j].properties.value = dataValue;
-          break;
-        }
-      }
-    }
 
-    if (error) return console.error(error);
 
-    //Set the projection and the path setting
-    var projection = d3.geo.mercator().scale(1000);
-    var path = d3.geo.path().projection(projection);
-    var featureCollection = topojson.feature(map, map.objects.collection);
-    var geometries = map.objects.collection.geometries;
-    var getGeoName = function (name) {
-      return name.properties.DR_NAME;
+    //Store the csv data into hash
+      for (var i = 0; i < data.length; i++) {
+      var regionName = data[i].Name;
+      var regionValue = parseFloat(data[i].Population);
+      regionsData[regionName]['population'] = regionValue;
     };
+
+    //Draw the map
+    var projection = d3.geo.mercator().scale(2000);
+    var path = d3.geo.path().projection(projection);
+    var featureCollection = topojson.feature(map, map.objects.bc_29_crs84);
+    var neighbors = topojson.neighbors(map.objects.bc_29_crs84.geometries);
+
+
+    function mouseOver(d){
+      var regionName = d.properties.CDNAME
+      var population = regionsData[regionName]['population']
+      displayName = regionName.split("_").join(" ")
+			d3.select("#tooltip").transition().duration(200).style("opacity", .9);
+			d3.select("#tooltip").html(toolTip(displayName, population))
+				.style("left", (d3.event.pageX) + "px")
+				.style("top", (d3.event.pageY - 28) + "px");
+		}
+
+		function mouseOut(){
+			d3.select("#tooltip").transition().duration(500).style("opacity", 0);
+		}
+
+    var mapJ = svg.selectAll("path")
+      .data(featureCollection.features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .attr("id", function (item) {
+        return item.properties.CDNAME;
+      })
+      .on("mouseover", mouseOver).on("mouseout", mouseOut);
+
+
+  var toolTip =   function tooltipHtml(d, population){
+  		return "<h4>"+d+"</h4><table>"+
+  			"<tr><td>Population</td><td>"+population+"</td></tr>"+
+  			"</table>";
+  	   }
+       toolTip();
+
+    // calculate bounding box coordinate
+    var result = {};
+    var regions = $('svg path').toArray()
+      .map(function (region) {
+        if (region.getAttribute('d')) {
+          return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+            var pairs = s.split(',');
+            return pairs.map(function (n) {
+              return parseFloat(n);
+            });
+          });
+        } else {
+
+        }
+      });
+    var allCoordinates = _.flatten(regions);
+    result.minX = _.min(allCoordinates, function (coordinate) {
+      return coordinate[0]
+    })[0];
+    result.minY = _.min(allCoordinates, function (coordinate) {
+      return coordinate[1]
+    })[1];
+    result.maxX = _.max(allCoordinates, function (coordinate) {
+      return coordinate[0]
+    })[0];
+    result.maxY = _.max(allCoordinates, function (coordinate) {
+      return coordinate[1]
+    })[1];
+    result.width = result.maxX - result.minX;
+    result.height = result.maxY - result.minY;
+
+    var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
+
+    $('svg').each(function () {
+      $(this)[0].setAttribute('viewBox', viewBox)
+    });
+
+
     //Get the neighbor reference list (In region name)
-    idName = geometries.map(getGeoName);
+    var getGeoName = function (name) {
+      return name.properties.CDNAME;
+    };
+    var idName = geometries.map(getGeoName);
     var neighbors = topojson.neighbors(geometries);
     var nameMap = function (geoIndex) {
       return getGeoName(geometries[geoIndex]);
@@ -63,60 +117,31 @@ d3.csv("population.csv", function (data) {
       valuesSoFar[name] = currentValue.map(nameMap);
       return valuesSoFar;
     }, {});
-    //Drawing the map
-    var mapJ = svg.selectAll("path")
-        .data(featureCollection.features)
-        .enter()
-        .append("path")
-        .attr("d", path)
-        .attr("id", function (item) {
-          return item.properties.DR_NAME;
-        })
-        .style("fill", function (d) {
-          //Get data value
-          var value = d.properties.value;
-          if (value) {
-            //If value exists…
-            return color(value);
-          } else {
-            //If value is undefined…
-            return "#ccc";
-          }
-        })
-      ;
 
-    //Assign the outbreak status of each regions
-    regionStatuts = idName.reduce(function(pre, current, index){
-      pre[current]= false ;
-      return pre;
-    },{});
+
   });
 });
-
-
-  $(function(){
-//When click the region, change the current region and neighbor regions
+//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
+$(function () {
   $('svg').on('click','path', function(){
+    $(this).attr('id');
     var currentRegion =  $(this).attr('id');
     var currentNeighbors = function(currentRegion){
       return neighborNames[currentRegion];
     };
+
     d3.select(this).style('fill', 'red');
-    regionStatuts[currentRegion] = true;
+
+    regionsData[currentRegion].infectStatus = true;
     var propagation = function(target){
       setTimeout(function(){
         currentNeighbors(target).forEach(function(region){
-          d3.selectAll('#'+region).style('fill', 'red');
-          regionStatuts[region] = true;
+          d3.select('#'+region).style('fill', 'red');
+          regionsData[region].infectStatus = true;
         })
       }, 1000)
     };
-
     propagation(currentRegion);
   });
-
-  function tooltip(){
-    $('path').addClass('tooltip');
-  };
 
 });
