@@ -24,7 +24,11 @@
 	</style>
 </head>
 <body>
+<div class="clouds">
+</div>
 <script>
+
+	//Set some SVG default value and some data will be use globally
 	var width = 500;
 	var height = 500;
 	var regionsData = {};
@@ -37,7 +41,7 @@
 	var neighborNames;
 	var centered;
 
-
+	//Read csv file and topo json files
 	d3.csv("RegionsBC.csv", function (data) {
 		d3.json("bc29.topo.json", function (map) {
 
@@ -57,11 +61,9 @@
 				regionsData[regionName]['populatoin'] = regionValue;
 			}
 
-			//Draw the map
+			//Draw the map: could change scale at any size
 			var projection = d3.geo.mercator().scale(5000);
 			var path = d3.geo.path().projection(projection);
-			var ali = 'ali';
-
 			var featureCollection = topojson.feature(map, map.objects.bc_29_crs84);
 			var neighbors = topojson.neighbors(map.objects.bc_29_crs84.geometries);
 			var mapJ = svg.selectAll("path")
@@ -111,17 +113,17 @@
 			//calculate single bounding box of region
 			$('svg path').toArray().forEach(function(region, index){
 				if (region.getAttribute('d')) {
-						var regionName = region.getAttribute('id');
-						var coordinates = region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
-							var pairs = s.split(',');
-							return pairs.map(function (n) {
-								return parseFloat(n);
-							});
+					var regionName = region.getAttribute('id');
+					var coordinates = region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+						var pairs = s.split(',');
+						return pairs.map(function (n) {
+							return parseFloat(n);
 						});
+					});
 					coordinates = getBoundingBox(coordinates);
-							regionsData[regionName]['bbox'] = coordinates;
-					}
-				});
+					regionsData[regionName]['bbox'] = coordinates;
+				}
+			});
 
 			//Set the view Box
 			var viewBox = getBoundingBox(allCoordinates);
@@ -149,18 +151,14 @@
 				if (d && centered !== d) {
 					centered = d;
 					var regionName = d.properties.CDNAME;
-					$('svg').each(function () {
-						$(this)[0].setAttribute('viewBox', regionsData[regionName]['bbox']);
-					});
+					d3.select('svg').transition().duration(1000).attr('viewBox', regionsData[regionName]['bbox'])
 				} else {
 					centered = null;
 					$('svg').each(function () {
-						$(this)[0].setAttribute('viewBox', viewBox)
+						d3.select('svg').transition().duration(1000).attr('viewBox', viewBox)
 					});
 				}
-
 			}
-
 		});
 	});
 	//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
