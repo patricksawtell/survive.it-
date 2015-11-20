@@ -7,6 +7,8 @@
 	<script src="node_modules/topojson/topojson.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="node_modules/textures/textures.js"></script>
+	<script src="liquid.js"></script>
 	<style>
 		path {
 			fill: #a6a6a6;
@@ -68,12 +70,24 @@
 	</style>
 </head>
 <body>
+<!--<svg id="fillgauge1" width="97%" height="250" onclick="gauge1.update(NewValue());"></svg>-->
+<!--<script>-->
+	<!--var gauge1 = loadLiquidFillGauge("fillgauge1", 55);-->
+	<!--var config1 = liquidFillGaugeDefaultSettings();-->
+	<!--config1.circleColor = "#FF7777";-->
+	<!--config1.textColor = "#FF4444";-->
+	<!--config1.waveTextColor = "#FFAAAA";-->
+	<!--config1.waveColor = "#FFDDDD";-->
+	<!--config1.circleThickness = 0.2;-->
+	<!--config1.textVertPosition = 0.2;-->
+	<!--config1.waveAnimateTime = 1000;-->
+<!--</script>-->
 
 <script>
 
 	//Set some SVG default value and some data will be use globally
-	var width = 500;
-	var height = 500;
+	var width = 700;
+	var height = 700;
 	var regionsData = {};
 	var svg = d3.select("body")
 		.append("svg")
@@ -104,6 +118,13 @@
 				regionsData[regionName]['populatoin'] = regionValue;
 			}
 
+
+			//Draw with pattern
+			var t = textures.circles()
+				.radius(4)
+				.fill("darkorange");
+
+			svg.call(t);
 			//Draw the map: could change scale at any size
 			var projection = d3.geo.mercator().scale(5000);
 			var path = d3.geo.path().projection(projection);
@@ -117,13 +138,15 @@
 				.attr("id", function (item) {
 					return item.properties.CDNAME;
 				})
-				.on('click', clicked);
+				.attr("class", "region")
+				.on('click', clicked)
+				.style("fill", t.url());
 
 			$('<div>').addClass('clouds').appendTo($('body'));
 
 
 			// calculate bounding box coordinate
-			var regions = $('svg path')
+			var regions = $('svg .region')
 				.toArray()
 				.map(function (region) {
 					if (region.getAttribute('d')) {
@@ -160,7 +183,7 @@
 				return viewBox;
 			}
 			//calculate single bounding box of region
-			$('svg path').toArray().forEach(function(region, index){
+			$('svg .region').toArray().forEach(function(region, index){
 				if (region.getAttribute('d')) {
 					var regionName = region.getAttribute('id');
 					var coordinates = region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
@@ -213,6 +236,10 @@
 	//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 	$(function () {
 
+
+		function setInfectTarget(target){
+			
+		}
 		$('svg').on('click', 'path', function () {
 
 			console.log($(this).attr('id'));
