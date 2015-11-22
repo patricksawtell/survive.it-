@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Test 3d map</title>
+	<script type="text/javascript" src="d3/d3.min.js"></script>
+	<script src="node_modules/topojson/topojson.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="node_modules/three/three.js" ></script>
+</head>
+<style>
+	svg{
+		border: solid 2px black;
+		width: 50%;
+		height: 60%;
+	}
+	path{
+		stroke: black;
+		stroke-width: 2px;
+		fill:url(#RadialGradient1);
+	}
+
+
+</style>
+<body>
+<svg viewBox="-11872.610730959665 -6511.620965054721 2398.1873234768755 1933.25517314549">
+	<defs>
+
+
+		<radialGradient id="RadialGradient1"  cx="0" cy="0">
+			<stop offset="50%" stop-color="red"/>
+			<stop offset="100%" stop-color="black"/>
+			<animate attributeName="r" dur="3s" from="0.5" to="2.5" repeatCount="1"  fill="freeze"/>
+			<!--<animate attributeName="fy" dur="700ms" from="0.1" to="0.9" repeatCount="indefinite"    />-->
+		</radialGradient>
+	</defs>
+	<path id ="region" d="M-9991.94149975161,-5995.828429964093L-10144.940980457763,-5995.629074780566L-10254.364049519818,-5995.728751529748L-10423.849296578052,-5995.828429964093L-10413.43723361884,-6030.017754975746L-10445.830318380824,-6035.333917396783L-10466.654444299244,-6052.216988680151L-10490.94925787073,-6046.583907590058L-10520.835734883274,-6065.4155152188L-10542.045492763144,-6095.1451745183895L-10568.461282122618,-6092.915279443681L-10607.988558171466,-6137.573282487113L-10600.372326932786,-6180.31176672286L-10617.725765198134,-6186.59002468241L-10645.973306374506,-6253.392804891494L-10666.315392341108,-6270.606049584574L-10672.871135685795,-6297.414291544069L-10666.122576360382,-6334.796579042793L-10569.039730064796,-6335.612885691676L-10471.95688376921,-6334.796579042793L-10362.823038678243,-6334.796579042793L-10210.112781943182,-6334.796579042793L-10101.027140847396,-6335.827234154967L-9991.94149975161,-6334.796579042793L-9991.94149975161,-6219.429409460703Z">
+	</path>
+</svg>
+
+<!--<script>-->
+	<!--jQuery.getJSON('bc29.topo.json', function(data, textStatus, jqXHR) {-->
+		<!--function initScene() {-->
+			<!--// set the scene size-->
+			<!--var WIDTH = 600, HEIGHT = 600;-->
+
+			<!--// set some camera attributes-->
+			<!--var VIEW_ANGLE = 45, ASPECT = WIDTH / HEIGHT, NEAR = 0.1, FAR = 10000;-->
+
+			<!--// create a WebGL renderer, camera, and a scene-->
+			<!--renderer = new THREE.WebGLRenderer({antialias:true});-->
+			<!--camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT,-->
+				<!--NEAR, FAR);-->
+			<!--scene = new THREE.Scene();-->
+
+			<!--// add and position the camera at a fixed position-->
+			<!--scene.add(camera);-->
+			<!--camera.position.z = 550;-->
+			<!--camera.position.x = 0;-->
+			<!--camera.position.y = 550;-->
+			<!--camera.lookAt( scene.position );-->
+
+			<!--// start the renderer, and black background-->
+			<!--renderer.setSize(WIDTH, HEIGHT);-->
+			<!--renderer.setClearColor(0x000);-->
+
+			<!--// add the render target to the page-->
+			<!--$("#chart").append(renderer.domElement);-->
+
+			<!--// add a light at a specific position-->
+			<!--var pointLight = new THREE.PointLight(0xFFFFFF);-->
+			<!--scene.add(pointLight);-->
+			<!--pointLight.position.x = 800;-->
+			<!--pointLight.position.y = 800;-->
+			<!--pointLight.position.z = 800;-->
+
+			<!--// add a base plane on which we'll render our map-->
+			<!--var planeGeo = new THREE.PlaneGeometry(10000, 10000, 10, 10);-->
+			<!--var planeMat = new THREE.MeshLambertMaterial({color: 0x666699});-->
+			<!--var plane = new THREE.Mesh(planeGeo, planeMat);-->
+
+			<!--// rotate it to correct position-->
+			<!--plane.rotation.x = -Math.PI/2;-->
+			<!--scene.add(plane);-->
+		<!--}-->
+		<!--debugger-->
+	<!--});-->
+
+<!--</script>-->
+</body>
+</html>
