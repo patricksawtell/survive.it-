@@ -30,7 +30,6 @@ d3.csv("RegionsBC.csv", function (data) {
       var regionGoats = data[i].Goats;
       var regionDeer = data[i].Deer;
       var regionCaribou = data[i].Caribou;
-      debugger
       regionsData[regionName]['population'] = +regionPopulation;
       regionsData[regionName]['density'] = +regionDensity;
       regionsData[regionName]['hospitals'] = +regionHospitals;
@@ -152,22 +151,6 @@ d3.csv("RegionsBC.csv", function (data) {
       valuesSoFar[name] = currentValue.map(nameMap);
       return valuesSoFar;
     }, {});
-
-    // //Click event
-    // function clicked(d){
-    //   if (d && centered !== d) {
-    //     centered = d;
-    //     var regionName = d.properties.CDNAME;
-    //     $('svg').each(function () {
-    //       $(this)[0].setAttribute('viewBox', regionsData[regionName]['bbox']);
-    //     });
-    //   } else {
-    //     centered = null;
-    //     $('svg').each(function () {
-    //       $(this)[0].setAttribute('viewBox', viewBox)
-    //     });
-    //   }
-    // }
   });
 });
 
@@ -177,19 +160,19 @@ $(function () {
   $('svg').on('click','path', function(){
     $(this).attr('id');
     var currentRegion =  $(this).attr('id');
-    console.log('regionsdata', regionsData);
-    console.log('id', currentRegion);
+
     var selectedRegion = regionsData[currentRegion];
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
-    console.log(graphData)
 
 // Create graphs for each region
-    var width = 300,
-        height = 200,
+    var width = 225,
+        height = 200
         radius = Math.min(width, height) / 2;
 
-    var color = d3.scale.ordinal()
-        .range(["#3399FF", "#5DAEF8", "#86C3FA", "#ADD6FB", "#D6EBFD"]);
+    var color = d3.scale.category10();
+    var domain = ["Caribou", "Bears", "Deer", "Goats"]
+    color.domain(domain)
+    .range(["#3399FF", "#5DAEF8", "#86C3FA", "#ADD6FB", "#D6EBFD"]);
 
     var arc = d3.svg.arc()
         .outerRadius(radius)
@@ -211,16 +194,57 @@ $(function () {
       .attr("class", "arc");
 
       g.append("path")
-          .attr("d", arc)
-          .style("fill", function(d) {
-            return color(graphData); });
-      console.log(regionsData)
+            .attr("d", arc)
+            .style("fill", function(d) {
+              return color(d.data); });
+
+// Generate labels for charts
 
       g.append("text")
           .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
           .attr("dy", ".35em")
           .style("text-anchor", "middle")
-          .text(function(d) { return d; });
+          .text(function(d) { return graphData.label; });
+
+          g.append("text")
+           .attr("transform", function(d) { //set the label's origin to the center of the arc
+             //we have to make sure to set these before calling arc.centroid
+             d.radius = radius + 50; // Set Outer Coordinate
+             d.innerRadius = radius + 45; // Set Inner Coordinate
+             return "translate(" + arc.centroid(d) + ")";
+           })
+           .attr("text-anchor", "middle") //center the text on it's origin
+           .style("fill", "Purple")
+           .style("font", "bold 12px Arial")
+           .text(function(d, i) { return selectedRegion[i]; }); //get the label from our original data array
+
+         // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
+         g.filter(function(d) { return d.endAngle - d.startAngle > .2; }).append("text")
+           .attr("dy", ".35em")
+           .attr("text-anchor", "middle")
+           //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
+           .attr("transform", function(d) { //set the label's origin to the center of the arc
+             //we have to make sure to set these before calling arc.centroid
+             d.radius = radius; // Set Outer Coordinate
+             d.innerRadius = radius/2; // Set Inner Coordinate
+             return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+           })
+           .style("fill", "White")
+           .style("font", "bold 10px Arial")
+           .text(function(d) { return d.data; });
+
+         // Computes the angle of an arc, converting from radians to degrees.
+         function angle(d) {
+           var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+           return a > 90 ? a - 180 : a;
+         }
+
+//Show/hide the info box based
+    function infoBox(){
+      $('svg').on('click', function(){
+        $('#info-box').toggle("slide", {direction:"down"}, 1000);
+      });
+    }
 
     var currentNeighbors = function(currentRegion){
       return neighborNames[currentRegion];
