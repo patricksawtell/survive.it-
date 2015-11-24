@@ -1,10 +1,10 @@
 var regionsData = {};
 var svg = d3.select("#map")
   .append("svg")
-  .attr("width", 600)
-  .attr("height", 600)
+  .attr("width", 500)
+  .attr("height", 500)
   .attr("viewBox", "-3160 -1725 655 527")
-  .style("border", "solid 5px black"); //can delete style if not needed
+
 
 var neighborNames;
 var centered;
@@ -53,12 +53,13 @@ d3.csv("RegionsBC.csv", function (data) {
       regionsData[regionName]['caribou'] = +regionCaribou;
     };
 
-      regionsData[regionName]['survivalrate'] = survivalRate(regionPopulation,regionDensity,regionHospitals,regionBears,regionGoats,regionCaribou,regionDeer )
-    }
 
+    regionsData[regionName]['survivalrate'] = survivalRate(regionPopulation,regionDensity,regionHospitals,regionBears,regionGoats,regionCaribou,regionDeer)
+
+//Calculate survival rate
     function survivalRate(population, density, hospital, bears, goats, caribou, deer){
-      return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02)
-    }
+      return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02);
+    };
 
 
 //Draw the map
@@ -101,6 +102,9 @@ d3.csv("RegionsBC.csv", function (data) {
         return item.properties.CDNAME;
       })
       .on("mouseover", mouseOver).on("mouseout", mouseOut);
+
+
+//Generate layers for filters
 
     populationLayer.selectAll("path")
       .data(featureCollection.features)
@@ -168,45 +172,6 @@ d3.csv("RegionsBC.csv", function (data) {
       })
       .style("opacity", 1);
 
-    goatsLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var goats = regionsData[name].goats;
-        return getColorLinear(goats, 'Goats')
-      })
-      .style("opacity", 1);
-
-    caribouLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var caribou = regionsData[name].caribou;
-        return getColorLinear(caribou, 'Caribou')
-      })
-      .style("opacity", 1);
-
-    deerLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var deer = regionsData[name].deer;
-        return getColorLinear(deer, 'Deer')
-      })
-      .style("opacity", 1);
-
     // Color functions
     function getColorLinear(val, prop) {
       var color = d3.scale.linear()
@@ -244,7 +209,7 @@ d3.csv("RegionsBC.csv", function (data) {
       return color(val);
     }
 
-    // calculate bounding box coordinate
+// calculate bounding box coordinate
     var regions = $('svg path').toArray()
  				.map(function (region) {
  					if (region.getAttribute('d')) {
@@ -276,8 +241,7 @@ d3.csv("RegionsBC.csv", function (data) {
 				var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
 				return viewBox;
 			}
-
-			//calculate single bounding box of region
+//calculate single bounding box of region
 			$('svg path').toArray().forEach(function(region, index){
 				if (region.getAttribute('d')) {
 						var regionName = region.getAttribute('id');
@@ -292,14 +256,13 @@ d3.csv("RegionsBC.csv", function (data) {
 					}
 				});
 
-		//Set the view Box
+//Set the view Box
 		var viewBox = getBoundingBox(allCoordinates);
     $('svg').each(function () {
       $(this)[0].setAttribute('viewBox', viewBox)
     });
 
-
-    //Get the neighbor reference list (In region name)
+//Get the neighbor reference list (In region name)
     function getGeoName(name) {
       return name.properties.CDNAME;
     }
@@ -320,21 +283,26 @@ d3.csv("RegionsBC.csv", function (data) {
 //$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 $(function () {
   $('svg').on('click','path', function(){
-    $(this).attr('id');
-    var currentRegion =  $(this).attr('id');
+    $('#info-box').slideDown("swing", 4000)
 
+    $(this).attr('id');
+
+    var currentRegion =  $(this).attr('id');
     var selectedRegion = regionsData[currentRegion];
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
 
+    $('#info-box').html(infoBox(currentRegion, regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
+    // $('#info-box').empty();
+
 // Create graphs for each region
-    var width = 225,
-        height = 200
+    var width = 200,
+        height = 125,
         radius = Math.min(width, height) / 2;
 
     var color = d3.scale.category10();
     var domain = ["Caribou", "Bears", "Deer", "Goats"]
     color.domain(domain)
-    .range(["#3399FF", "#5DAEF8", "#86C3FA", "#ADD6FB", "#D6EBFD"]);
+    .range(["#add4a3", "#65b6aa", "#5b7d8d", "#4f2958"]);
 
     var arc = d3.svg.arc()
         .outerRadius(radius)
@@ -401,71 +369,17 @@ $(function () {
            return a > 90 ? a - 180 : a;
          }
 
-//Show/hide the info box based
-    function infoBox(){
-      $('svg').on('click', function(){
-        $('#info-box').toggle("slide", {direction:"down"}, 1000);
+//Generate infobox
+    function infoBox(d, population, density, hospitals){
+      $('#info-box').html( function(){
+          return "<h3>"+d+"</h3>"+
+          "<ul>"+
+            "<li>Population: " +population+ "</li>"+
+            "<li>Population Density: " +density+"</li>"+
+            "<li>Hospitals: " +hospitals+"</li>";
       });
     }
 
-    var currentNeighbors = function(currentRegion){
-      return neighborNames[currentRegion];
-    };
 
-    d3.select(this).style('fill', 'red');
-
-    regionsData[currentRegion].infectStatus = true;
-    var propagation = function(target){
-      setTimeout(function(){
-        currentNeighbors(target).forEach(function(region){
-          d3.select('#'+region).style('fill', 'red');
-          regionsData[region].infectStatus = true;
-        })
-      }, 1000)
-    };
-    propagation(currentRegion);
   });
-
-// Infection rate propagation
-
-$(function () {
-  $('svg').on('click', 'path', function () {
-
-      var currentRegion = $(this).attr('id');
-      var currentNeighbors = function (currentRegion) {
-          var neighbours = neighborNames[currentRegion];
-          return neighbours.filter(function(name) {
-              return !regionsData[name].infectStatus;
-          });
-      };
-      //d3.select(this).style('fill', 'red');
-
-      //regionsData[currentRegion].infectStatus = true;
-      //var propagation = function (target) {
-      //    if (currentNeighbors(target).length == 0) return;
-      //    setTimeout(function () {
-      //        currentNeighbors(target).forEach(function (region) {
-      //            d3.select('#' + region).style('fill', 'red');
-      //            regionsData[region].infectStatus = true;
-      //            propagation(region);
-      //
-      //        })
-      //    }, 1000)
-
-      //using d3.select(this) will overwrite current layer's color, changed logic so it targets same layer as the propagation
-      regionsData[currentRegion].infectStatus = true;
-      var propagation = function(target){
-        d3.select('#'+target).style('fill', 'red');
-        setTimeout(function(){
-          currentNeighbors(target).forEach(function(region){
-            d3.select('#'+region).style('fill', 'red');
-            regionsData[region].infectStatus = true;
-          })
-        }, 1000)
-      };
-      propagation(currentRegion);
-  });
-
-});
-
 });
