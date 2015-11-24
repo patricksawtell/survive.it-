@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+
+</head>
+<body>
+<button id="start">Start</button>
+<script>
+	(function ($) {
+
+		var o = $({});
+
+		$.subscribe = function () {
+			o.on.apply(o, arguments);
+		};
+
+		$.unsubscribe = function () {
+			o.off.apply(o, arguments);
+		};
+
+		$.publish = function () {
+			o.trigger.apply(o, arguments);
+		};
+
+	}(jQuery));
+</script>
+<script>
+	$(function () {
+		var STATE = {
+			day: 0,
+			regions: [{
+				name: 'Lower Mainland',
+				infected: false
+			}]
+		};
+		var delay = 200;
+		var $start = $('#start');
+		$start.on('click', function () {
+			$.publish('start');
+		});
+		$.subscribe('start', function () {
+			console.log('start');
+			$start.attr('disabled', 'disabled');
+			STATE.day = 0;
+			setTimeout(runSimulation, delay);
+		});
+		function runSimulation() {
+			console.log('runSimulation');
+			$.publish('nextDay', ++STATE.day);
+			if (STATE.day < 28) {
+				setTimeout(runSimulation, delay);
+			} else {
+				$.publish('finished');
+			}
+		}
+		$.subscribe('nextDay', function (evt, dayNumber) {
+			console.log(dayNumber);
+			STATE.regions.forEach(function (region) {
+				if (region.infected) {
+					$.publish('infected', region);
+				} else {
+					// should I infect the region?
+					// if newly infected
+					// $.publish('newlyInfected', region);
+				}
+			})
+		});
+		$.subscribe('infected', function (evt, region) {
+			// update that region in the UI
+			// increase the infection level in that region
+		});
+		$.subscribe('finished', function () {
+			console.log();
+			$start.removeAttr('disabled');
+		})
+	});
+</script>
+</body>
+</html>

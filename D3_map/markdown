@@ -1,0 +1,13 @@
+//  Set the start infect region to true
+
+//  Find the infected regions list
+
+//  Find all the regions with true +20 until 100
+
+//  Find all the regions with +60 > take the neighbor with infect status false
+
+//  Store to history
+
+//  Draw the animation
+
+//  if every regions is been infected, to 100 then game stop

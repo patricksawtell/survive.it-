@@ -8,7 +8,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<script src="node_modules/textures/textures.js"></script>
-	<script src="liquid.js"></script>
+	<!--<script src="liquid.js"></script>-->
+	<script src="node_modules/gsap/src/minified/TweenLite.min.js"></script>
+	<script src="node_modules/gsap/src/minified/plugins/CSSPlugin.min.js"></script>
 	<style>
 		path {
 			fill: white;
@@ -66,13 +68,36 @@
 			border: solid 5px black;
 		}
 
-	.infect{
-		fill:url(#radialGradient);
-	}
+		.infect{
+			fill:url(#radialGradient);
+		}
 
 	</style>
 </head>
 <body>
+
+<script>
+
+	(function ($) {
+
+		var o = $({});
+
+		$.subscribe = function () {
+			o.on.apply(o, arguments);
+		};
+
+		$.unsubscribe = function () {
+			o.off.apply(o, arguments);
+		};
+
+		$.publish = function () {
+			o.trigger.apply(o, arguments);
+		};
+
+	}(jQuery));
+
+</script>
+
 <script>
 
 	//Set some SVG default value and some data will be use globally
@@ -84,12 +109,11 @@
 		.attr("width", width)
 		.attr("height", height)
 		.style("border", "solid 5px black");
-	var def = d3.select("svg")
-		.append("defs")
-		.attr("class","animate");
 	var neighborNames;
 	var neighborDirection;
 	var centered;
+	var infectionHistory = [];
+
 
 	//Read csv file and topo json files
 	d3.csv("RegionsBC.csv", function (data) {
@@ -101,8 +125,8 @@
 				var name = region.properties.CDNAME;
 				regionsData[name] = {};
 				regionsData[name]['infectStatus'] = false;
+				regionsData[name]['infectDegree'] = 0;
 			});
-
 
 			//Store the csv data into hash
 			for (var i = 0; i < data.length; i++) {
@@ -110,7 +134,6 @@
 				var regionValue = parseFloat(data[i].Population);
 				regionsData[regionName]['populatoin'] = regionValue;
 			}
-
 
 			//Draw with pattern
 			var t = textures.circles()
@@ -137,65 +160,65 @@
 			$('<div>').addClass('clouds').appendTo($('body'));
 
 
-			//Create gradient
-
-
-			var center = def.append('radialGradient')
-				.attr('id','center')
-				.attr('cx','0.5')
-				.attr('cy', '0.5');
-
-			var right_bottom = def.append('radialGradient')
-				.attr('id','right_bottom')
-				.attr('cx','1')
-				.attr('cy', '1');
-
-			var right_top = def.append('radialGradient')
-				.attr('id','right_top')
-				.attr('cx','1')
-				.attr('cy', '0');
-
-			var right = def.append('radialGradient')
-				.attr('id','right')
-				.attr('cx','1')
-				.attr('cy', '0.5');
-
-			var left = def.append('radialGradient')
-				.attr('id','left')
-				.attr('cx','0')
-				.attr('cy', '0.5');
-
-			var left_top = def.append('radialGradient')
-				.attr('id','left_top')
-				.attr('cx','0')
-				.attr('cy', '0');
-
-			var left_bottom = def.append('radialGradient')
-				.attr('id','left_bottom')
-				.attr('cx','0')
-				.attr('cy', '1');
-
-			var top = def.append('radialGradient')
-				.attr('id','top')
-				.attr('cx','0.5')
-				.attr('cy', '1');
-
-			var bottom = def.append('radialGradient')
-				.attr('id','bottom')
-				.attr('cx','0.5')
-				.attr('cy', '0');
-
-			d3.selectAll("radialgradient").append('stop').attr("offset", "50%")
-				.attr("stop-color", "red");
-			d3.selectAll("radialgradient").append('stop').attr("offset", "100%")
-				.attr("stop-color", "white");
-
-			d3.selectAll("radialgradient").append('animate').attr("attributeName", "r")
-				.attr("dur", "12s")
-				.attr("from", "0.01")
-				.attr("to", "2")
-				.attr("repeatCount", "1")
-				.attr("fill", "freeze");
+//			//Create gradient
+//
+//
+//			var center = def.append('radialGradient')
+//				.attr('id','center')
+//				.attr('cx','0.5')
+//				.attr('cy', '0.5');
+//
+//			var right_bottom = def.append('radialGradient')
+//				.attr('id','right_bottom')
+//				.attr('cx','1')
+//				.attr('cy', '1');
+//
+//			var right_top = def.append('radialGradient')
+//				.attr('id','right_top')
+//				.attr('cx','1')
+//				.attr('cy', '0');
+//
+//			var right = def.append('radialGradient')
+//				.attr('id','right')
+//				.attr('cx','1')
+//				.attr('cy', '0.5');
+//
+//			var left = def.append('radialGradient')
+//				.attr('id','left')
+//				.attr('cx','0')
+//				.attr('cy', '0.5');
+//
+//			var left_top = def.append('radialGradient')
+//				.attr('id','left_top')
+//				.attr('cx','0')
+//				.attr('cy', '0');
+//
+//			var left_bottom = def.append('radialGradient')
+//				.attr('id','left_bottom')
+//				.attr('cx','0')
+//				.attr('cy', '1');
+//
+//			var top = def.append('radialGradient')
+//				.attr('id','top')
+//				.attr('cx','0.5')
+//				.attr('cy', '1');
+//
+//			var bottom = def.append('radialGradient')
+//				.attr('id','bottom')
+//				.attr('cx','0.5')
+//				.attr('cy', '0');
+//
+//			d3.selectAll("radialgradient").append('stop').attr("offset", "50%")
+//				.attr("stop-color", "red");
+//			d3.selectAll("radialgradient").append('stop').attr("offset", "100%")
+//				.attr("stop-color", "white");
+//
+//			d3.selectAll("radialgradient").append('animate').attr("attributeName", "r")
+//				.attr("dur", "12s")
+//				.attr("from", "0.01")
+//				.attr("to", "2")
+//				.attr("repeatCount", "1")
+//				.attr("fill", "freeze");
 
 
 
@@ -263,13 +286,13 @@
 			function getCenterCoordinate(Coordinates, region) {
 				var bbox = regionsData[region]['bbox'].split(' ').map(function(c){
 					return parseFloat(c);});
-					var x = bbox[0]+(bbox[2]/2);
-					var y = bbox[1]+(bbox[3]/2);
-					return [x, y];
+				var x = bbox[0]+(bbox[2]/2);
+				var y = bbox[1]+(bbox[3]/2);
+				return [x, y];
 			}
 
 
-			//Compare direction of two bregions
+			//Compare direction of two regions
 
 			function getDirection(from, to){
 				var x1 = from[0], y1 = from[1];
@@ -288,14 +311,14 @@
 					}else if(y1 < y2){
 						return "left_top"
 					}else{
-					return 	"left"
+						return 	"left"
 					}
 				}
 				else{
 					if(y1 < y2){
-					return "bottom"
+						return "bottom"
 					}else{
-					return	"top"
+						return	"top"
 					}
 				}
 			}
@@ -324,100 +347,122 @@
 			neighborDirection = neighbors.reduce(function (valuesSoFar, currentValue, index) {
 				var name = idName[index];
 				valuesSoFar[name] = {};
-					currentValue.forEach(function(value, index){
+				currentValue.forEach(function(value, index){
 					var result = {};
 					var regionName = nameMap(value);
 					var fromPoint = regionsData[name]["center"];
 					var toPoint = regionsData[regionName]["center"];
-						valuesSoFar[name][regionName] = getDirection(fromPoint, toPoint);
+					valuesSoFar[name][regionName] = getDirection(fromPoint, toPoint);
 				});
 				return valuesSoFar;
 			}, {});
 
-			//Click event
-//			function clicked(d){
-//				if (d && centered !== d) {
-//					centered = d;
-//					var regionName = d.properties.CDNAME;
-//					d3.select('svg').transition().duration(1000).attr('viewBox', regionsData[regionName]['bbox'])
-//				} else {
-//					centered = null;
-//					$('svg').each(function () {
-//						d3.select('svg').transition().duration(1000).attr('viewBox', viewBox)
-//					});
-//				}
-//			}
 		});
 	});
+
+
 	//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 	$(function () {
+
+		var def = d3.select("svg")
+			.append("defs")
+			.attr("class","animate");
 
 		$('body').on('input', '#slider', function() {
 			console.log('current value: ', $(this).val());
 		});
 
 		$('svg').on('click', 'path', function () {
+			var day = 0;
+			var startRegion = $(this).attr('id');
+			regionsData[startRegion].infectStatus = true;
+			regionsData[startRegion].direction = "center";
 
-			var currentRegion = $(this).attr('id');
-			var getCurrentNeighbors = function (currentRegion) {
+			//When outbreak spread, you need to find the neighbours without being infected yet
+			function getCurrentNeighbors(currentRegion) {
 				var neighbours = neighborNames[currentRegion];
 				return neighbours.filter(function(name) {
 					return !regionsData[name].infectStatus;
 				});
-			};
-//			d3.select(this).style('fill', 'url(RadialGradient1)');
-			regionsData[currentRegion].infectStatus = true;
-			var day = 0;
-			var propagationData = [];
-			var infectionHistory = [];
+			}
+			//Make sure the game could stop looping when there is no more survivor
+			function survivorsLeft(){
+				return Object.keys(regionsData).some(function (key) {
+					return this[key].infectDegree < 100;
+				}, regionsData);
+			}
 
-			var infect = function(targets) {
-				//Check if there is no more targets
-				if( !targets.length) {
-					console.log('FINISHED');
-					$('#slider').show();
+			// Add infectDegree to infectStatus true regions + Spread outbreak to neighbours
+			function propagate(infectedRegionKey) {
+				var infectedRegion = this[infectedRegionKey];
+
+				if (infectedRegion.infectDegree < maxDegree) {
+					infectedRegion.infectDegree += infectionIncrement;
+				}
+				if (infectedRegion.infectDegree === infectionThreshold) {
+					var neighbourList = getCurrentNeighbors(infectedRegionKey);
+					function notInfectedNeighbourFilter(neighbour) {
+						return !this[neighbour].infectStatus;
+					}
+					function infectNeighbour(neighbour) {
+						this[neighbour].infectStatus = true;
+						this[neighbour].direction = neighborDirection[infectedRegionKey][neighbour];
+					}
+					neighbourList.filter(notInfectedNeighbourFilter, this).forEach(infectNeighbour, this);
+				}
+			}
+
+			//Take snapshot of 0 day
+			infectionHistory[0] = {};
+			Object.keys(regionsData).forEach(function(region){
+				infectionHistory[0][region] = {};
+				infectionHistory[0][region]["infecStatus"] = regionsData[region]["infectStatus"];
+				infectionHistory[0][region]["infectDegree"] = regionsData[region]["infectDegree"];
+				infectionHistory[0][region]["direction"] = regionsData[region]["direction"];
+			});
+
+
+			//initialize the game properties
+			var infectionIncrement = 20;
+			var infectionThreshold = infectionIncrement * 2;
+			var maxDegree = 100;
+			//Start Game Logic
+
+			function infect() {
+
+				//1. Start a new day
+				++day;
+				infectionHistory[day] = {};
+				console.log("day ", day);
+				//2. Run propagation to the regions with true infectStatus
+				Object.keys(regionsData).filter(function (region) {
+					return this[region].infectStatus;
+				}, regionsData).forEach(propagate, regionsData);
+				//3. Save snapshot of today's records of all the history
+				Object.keys(regionsData).forEach(function (regionKey) {
+					var region = this[regionKey];
+					infectionHistory[day][regionKey] = {
+						infectStatus: region.infectStatus,
+						infectDegree: region.infectDegree,
+						direction: region.direction
+					};
+				}, regionsData);
+
+				console.log("Day", day, " - infectHistory: ", infectionHistory);
+				//4. Animation
+//					ChangeColor(record);
+
+				//5. if every regions is been infected, to 100 then game stop
+				if ( !survivorsLeft() || day === 28) {
+					console.log('Finish');
 					return;
 				}
-
-				//Record the infect history
-				infectionHistory[day] = targets;
-				console.log('Infecting '+targets.length+' new targets on day #'+day);
-				console.log(infectionHistory);
-
-				//Set the targets to be true infected status
-				targets.forEach(function(target) {
-					regionsData[target[0]].infectStatus = true;
-				});
-
-				var nextRoundTargets = [];
-				//Change the targets color, set the neighbors list for next round
-				targets.forEach(function(target, index) {
-					var currentTarget = target[0];
-					var currentNeighborsList = getCurrentNeighbors(currentTarget);
-					//set the next round targets and spread directions
-					nextRoundTargets = nextRoundTargets.concat(
-							currentNeighborsList.map(function(currentNeighbor) {
-								var result = [];
-								result[0] = currentNeighbor;
-								result[1] = neighborDirection[currentTarget][currentNeighbor];
-								return result;
-							})
-					);
-					//Take out the duplicate list
-					nextRoundTargets = _.uniq(nextRoundTargets);
-
-					// color the  all infected red
-					var direction = targets[index][1];
-					d3.select('#' + currentTarget).style('fill', 'url(#'+ direction +')');
-				});
+				//6. Run next day
 				setTimeout(function() {
-					day++;
-					infect(nextRoundTargets);
+					infect();
 				}, 1000);
-
-			};
-			infect([[currentRegion , "center"]]);
-
+			}
+			infect();
 		});
 	});
 </script>
