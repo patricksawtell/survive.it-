@@ -30,7 +30,6 @@ d3.csv("RegionsBC.csv", function (data) {
       var regionGoats = data[i].Goats;
       var regionDeer = data[i].Deer;
       var regionCaribou = data[i].Caribou;
-      debugger
       regionsData[regionName]['population'] = +regionPopulation;
       regionsData[regionName]['density'] = +regionDensity;
       regionsData[regionName]['hospitals'] = +regionHospitals;
