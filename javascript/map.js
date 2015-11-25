@@ -17,7 +17,7 @@ var caribouLayer = svg.append("g").attr("id", "caribou");
 var deerLayer = svg.append("g").attr("id", "deer");
 
 
-d3.csv("RegionsBc.csv", function (data) {
+d3.csv("RegionsBC.csv", function (data) {
   d3.json("bc29.topo.json", function (map) {
 
     //Initialize the region data in hash
