@@ -23,19 +23,4 @@ $(document).ready(function() {
       $(self).siblings().not("#main").attr("style","display: none");
     });
   });
-
-// Toggle filter
-  $("#info-box").on("click","#select-btn", function(){
-    $("#side-nav").slideUp("fast");
-    $('g').not("#main").attr("style","display: none");
-    var board = $("<div>").css({
-      "border": "solid 2px white",
-      "border-radius": "10px",
-      "width": "95%",
-      "height": "300px",
-      "margin": "10px auto"
-    });
-    $("#side").append(board)
-  })
-
 });
