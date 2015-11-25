@@ -111,7 +111,6 @@
 		.style("border", "solid 5px black");
 	var neighborNames;
 	var neighborDirection;
-	var centered;
 	var infectionHistory = [];
 
 
@@ -132,7 +131,7 @@
 			for (var i = 0; i < data.length; i++) {
 				var regionName = data[i].Name;
 				var regionValue = parseFloat(data[i].Population);
-				regionsData[regionName]['populatoin'] = regionValue;
+				regionsData[regionName]['population'] = regionValue;
 			}
 
 			//Draw with pattern

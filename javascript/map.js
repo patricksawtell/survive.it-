@@ -1,12 +1,15 @@
+var width = 700;
+var height = 700;
 var regionsData = {};
 var svg = d3.select("#map")
   .append("svg")
-  .attr("width", 500)
-  .attr("height", 500)
-  .attr("viewBox", "-3160 -1725 655 527")
+  .attr("width", width)
+  .attr("height", height);
 
-var neighborNames;
+
+var mapB = svg.append("g").attr("id", "background");
 var mapJ = svg.append("g").attr("id", "main");
+
 var densityLayer = svg.append("g").attr("id", "density");
 var populationLayer = svg.append("g").attr("id", "population");
 var hospitalsLayer = svg.append("g").attr("id", "hospitals");
@@ -15,6 +18,10 @@ var bearsLayer = svg.append("g").attr("id", "bears");
 var goatsLayer = svg.append("g").attr("id", "goats");
 var caribouLayer = svg.append("g").attr("id", "caribou");
 var deerLayer = svg.append("g").attr("id", "deer");
+var neighborNames;
+var neighborDirection;
+var infectionHistory = [];
+
 
 
 d3.csv("RegionsBC.csv", function (data) {
@@ -26,6 +33,7 @@ d3.csv("RegionsBC.csv", function (data) {
       var name = region.properties.CDNAME;
       regionsData[name] = {};
       regionsData[name]['infectStatus'] = false;
+      regionsData[name]['infectDegree'] = 0;
     });
 
     //Store the csv data into hash
@@ -48,16 +56,16 @@ d3.csv("RegionsBC.csv", function (data) {
       regionsData[regionName]['goats'] = +regionGoats;
       regionsData[regionName]['deer'] = +regionDeer;
       regionsData[regionName]['caribou'] = +regionCaribou;
+      regionsData[regionName]['survivalrate'] = survivalRate(regionPopulation,regionDensity,regionHospitals,regionBears,regionGoats,regionCaribou,regionDeer )
     };
-      //regionsData[regionName]['survivalrate'] = survivalRate(regionPopulation,regionDensity,regionHospitals,regionBears,regionGoats,regionCaribou,regionDeer )
-    //
-    //function survivalRate(population, density, hospital, bears, goats, caribou, deer){
-    //  return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02)
-    //}
+
+    function survivalRate(population, density, hospital, bears, goats, caribou, deer){
+      return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02)
+    }
 
 
 
-//Draw the map
+//Set Projection and get the neighbours list(but only with number)
     var projection = d3.geo.mercator().scale(2000);
     var path = d3.geo.path().projection(projection);
     var featureCollection = topojson.feature(map, map.objects.bc_29_crs84);
@@ -69,24 +77,30 @@ d3.csv("RegionsBC.csv", function (data) {
       var regionName = d.properties.CDNAME
       var population = regionsData[regionName]['population']
       displayName = regionName.split("_").join(" ")
-			d3.select("#tooltip").transition().duration(200).style("opacity", .9);
-			d3.select("#tooltip").html(toolTip(displayName, population))
-				.style("left", (d3.event.pageX) + "px")
-				.style("top", (d3.event.pageY - 28) + "px");
-		}
+      d3.select("#tooltip").transition().duration(200).style("opacity", .9);
+      d3.select("#tooltip").html(toolTip(displayName, population))
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px");
+    }
 
-		function mouseOut(){
-			d3.select("#tooltip").transition().duration(500).style("opacity", 0);
-		}
+    function mouseOut(){
+      d3.select("#tooltip").transition().duration(500).style("opacity", 0);
+    }
 
     var toolTip =   function tooltipHtml(d, population){
-    		return "<h4>"+d+"</h4><table>"+
-    			"<tr><td>Population</td><td>"+population+"</td></tr>"+
-    			"</table>";
-    	   }
-         toolTip();
+      return "<h4>"+d+"</h4><table>"+
+        "<tr><td>Population</td><td>"+population+"</td></tr>"+
+        "</table>";
+    }
+    toolTip();
 
 // Draws the map regions
+    mapB.selectAll("path")
+      .data(featureCollection.features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .attr("class", "background");
 
     mapJ.selectAll("path")
       .data(featureCollection.features)
@@ -96,11 +110,13 @@ d3.csv("RegionsBC.csv", function (data) {
       .attr("id", function (item) {
         return item.properties.CDNAME;
       })
+      .attr("class", "region")
       .on("mouseover", mouseOver).on("mouseout", mouseOut);
 
+//Draw Cloud
+//    $('<div>').addClass('clouds').text('Hi').appendTo($('body'));
 
 //Generate layers for filters
-
     populationLayer.selectAll("path")
       .data(featureCollection.features)
       .enter()
@@ -120,7 +136,6 @@ d3.csv("RegionsBC.csv", function (data) {
       .append("path")
       .attr("d", path)
       .attr("id", getGeoName)
-//				.style("fill", colorForProp('Density', '#faa'))
       .style("fill", function(d){
         var name = d.properties.CDNAME;
         var density = regionsData[name].density;
@@ -196,71 +211,111 @@ d3.csv("RegionsBC.csv", function (data) {
         ])
         .range([
           "white", "red"]);
-//					 .range([
-//						 textures.lines().thinner(),
-//						 textures.lines().thicker()
-//					 ]);
-
       return color(val);
     }
 
-// calculate bounding box coordinate
-    var regions = $('svg path').toArray()
- 				.map(function (region) {
- 					if (region.getAttribute('d')) {
- 						return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
- 							var pairs = s.split(',');
- 							return pairs.map(function (n) {
- 								return parseFloat(n);
- 							});
- 						});
-          }
+    // calculate bounding box coordinate
+    var regions = $('svg .region')
+      .toArray()
+      .map(function (region) {
+        if (region.getAttribute('d')) {
+          return region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+            var pairs = s.split(',');
+            return pairs.map(function (n) {
+              return parseFloat(n);
+            });
+          });
+        }
       });
     var allCoordinates = _.flatten(regions);
-    function getBoundingBox(Coordinates) {
-				var result = {};
-				result.minX = _.min(Coordinates, function (coordinate) {
-					return coordinate[0]
-				})[0];
-				result.minY = _.min(Coordinates, function (coordinate) {
-				return coordinate[1]
-				})[1];
-				result.maxX = _.max(Coordinates, function (coordinate) {
-					return coordinate[0]
-				})[0];
-				result.maxY = _.max(Coordinates, function (coordinate) {
-					return coordinate[1]
-				})[1];
-				result.width = result.maxX - result.minX;
-				result.height = result.maxY - result.minY;
-				var viewBox = result.minX + ' ' + result.minY + ' ' + result.width + ' ' + result.height;
-				return viewBox;
-			}
-//calculate single bounding box of region
-			$('svg path').toArray().forEach(function(region, index){
-				if (region.getAttribute('d')) {
-						var regionName = region.getAttribute('id');
-						var coordinates = region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
-							var pairs = s.split(',');
-							return pairs.map(function (n) {
-								return parseFloat(n);
-							});
-						});
-					coordinates = getBoundingBox(coordinates);
-							regionsData[regionName]['bbox'] = coordinates;
-					}
-				});
 
-//Set the view Box
-		var viewBox = getBoundingBox(allCoordinates);
+    function getBoundingBox(Coordinates) {
+      var result = {};
+      result.minX = _.min(Coordinates, function (coordinate) {
+        return coordinate[0]
+      })[0];
+      result.minY = _.min(Coordinates, function (coordinate) {
+        return coordinate[1]
+      })[1];
+      result.maxX = _.max(Coordinates, function (coordinate) {
+        return coordinate[0]
+      })[0];
+      result.maxY = _.max(Coordinates, function (coordinate) {
+        return coordinate[1]
+      })[1];
+      result.width = result.maxX - result.minX;
+      result.height = result.maxY - result.minY;
+      var marginW = result.width * 0.1;
+      var marginH = result.height * 0.1;
+
+      var viewBox = (result.minX - marginW) + ' ' + (result.minY - marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
+      return viewBox;
+    }
+    //Set the view Box
+    var viewBox = getBoundingBox(allCoordinates);
     $('svg').each(function () {
       $(this)[0].setAttribute('viewBox', viewBox)
     });
+    //calculate single bounding box of region
+    $('svg .region').toArray().forEach(function(region, index){
+      if (region.getAttribute('d')) {
+        var regionName = region.getAttribute('id');
+        var coordinates = region.getAttribute('d').split(/[MZ]/).join('').split('L').map(function (s) {
+          var pairs = s.split(',');
+          return pairs.map(function (n) {
+            return parseFloat(n);
+          });
+        });
+        coordinates = getBoundingBox(coordinates);
+        regionsData[regionName]['bbox'] = coordinates;
+        var center = getCenterCoordinate(coordinates, regionName);
+        regionsData[regionName]['center'] = center;
+      }
+    });
 
-//Get the neighbor reference list (In region name)
-    function getGeoName(name) {
-      return name.properties.CDNAME;
+    //Get the center of bbox
+    function getCenterCoordinate(Coordinates, region) {
+      var bbox = regionsData[region]['bbox'].split(' ').map(function(c){
+        return parseFloat(c);});
+      var x = bbox[0]+(bbox[2]/2);
+      var y = bbox[1]+(bbox[3]/2);
+      return [x, y];
     }
+
+    //Compare direction of two regions
+    function getDirection(from, to){
+      var x1 = from[0], y1 = from[1];
+      var x2 = to[0], y2 = to[1];
+      if(x1 > x2){
+        if(y1 > y2){
+          return "right_bottom"
+        }else if(y1 < y2){
+          return "right_top"
+        }else{
+          return "right"
+        }
+      }else if(x1 < x2){
+        if(y1 > y2){
+          return "left_bottom"
+        }else if(y1 < y2){
+          return "left_top"
+        }else{
+          return 	"left"
+        }
+      }
+      else{
+        if(y1 < y2){
+          return "bottom"
+        }else{
+          return	"top"
+        }
+      }
+    }
+
+    //Get the neighbor reference list (In region name)
+    var getGeoName = function (region) {
+      return region.properties.CDNAME;
+    };
     var idName = geometries.map(getGeoName);
     var neighbors = topojson.neighbors(geometries);
     var nameMap = function (geoIndex) {
@@ -269,6 +324,20 @@ d3.csv("RegionsBC.csv", function (data) {
     neighborNames = neighbors.reduce(function (valuesSoFar, currentValue, index) {
       var name = idName[index];
       valuesSoFar[name] = currentValue.map(nameMap);
+      return valuesSoFar;
+    }, {});
+
+    //Get the direction of neighbor
+    neighborDirection = neighbors.reduce(function (valuesSoFar, currentValue, index) {
+      var name = idName[index];
+      valuesSoFar[name] = {};
+      currentValue.forEach(function(value, index){
+        var result = {};
+        var regionName = nameMap(value);
+        var fromPoint = regionsData[name]["center"];
+        var toPoint = regionsData[regionName]["center"];
+        valuesSoFar[name][regionName] = getDirection(fromPoint, toPoint);
+      });
       return valuesSoFar;
     }, {});
   });
@@ -287,94 +356,207 @@ $(function () {
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
 
     $('#info-box').html(infoBox(currentRegion, regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
-    // $('#info-box').empty();
 
 // Create graphs for each region
     var width = 200,
-        height = 125,
-        radius = Math.min(width, height) / 2;
+      height = 125,
+      radius = Math.min(width, height) / 2;
 
     var color = d3.scale.category10();
     var domain = ["Caribou", "Bears", "Deer", "Goats"]
     color.domain(domain)
-    .range(["#add4a3", "#65b6aa", "#5b7d8d", "#4f2958"]);
+      .range(["#add4a3", "#65b6aa", "#5b7d8d", "#4f2958"]);
 
     var arc = d3.svg.arc()
-        .outerRadius(radius)
-        .innerRadius(radius - 20);
+      .outerRadius(radius)
+      .innerRadius(radius - 20);
 
     var pie = d3.layout.pie()
-        .sort(null)
-        .value(function(d) { return d;});
+      .sort(null)
+      .value(function(d) { return d;});
 
     var svg = d3.select("#info-box").append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+      .attr("width", width)
+      .attr("height", height)
+      .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
     var g = svg.selectAll(".arc")
       .data(pie(graphData))
       .enter().append("g")
       .attr("class", "arc");
 
-      g.append("path")
-            .attr("d", arc)
-            .style("fill", function(d) {
-              return color(d.data); });
+    g.append("path")
+      .attr("d", arc)
+      .style("fill", function(d) {
+        return color(d.data); });
 
 // Generate labels for charts
 
-      g.append("text")
-          .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-          .attr("dy", ".35em")
-          .style("text-anchor", "middle")
-          .text(function(d) { return graphData.label; });
+    g.append("text")
+      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+      .attr("dy", ".35em")
+      .style("text-anchor", "middle")
+      .text(function(d) { return graphData.label; });
 
-          g.append("text")
-           .attr("transform", function(d) { //set the label's origin to the center of the arc
-             //we have to make sure to set these before calling arc.centroid
-             d.radius = radius + 50; // Set Outer Coordinate
-             d.innerRadius = radius + 45; // Set Inner Coordinate
-             return "translate(" + arc.centroid(d) + ")";
-           })
-           .attr("text-anchor", "middle") //center the text on it's origin
-           .style("fill", "Purple")
-           .style("font", "bold 12px Arial")
-           .text(function(d, i) { return selectedRegion[i]; }); //get the label from our original data array
+    g.append("text")
+      .attr("transform", function(d) { //set the label's origin to the center of the arc
+        //we have to make sure to set these before calling arc.centroid
+        d.radius = radius + 50; // Set Outer Coordinate
+        d.innerRadius = radius + 45; // Set Inner Coordinate
+        return "translate(" + arc.centroid(d) + ")";
+      })
+      .attr("text-anchor", "middle") //center the text on it's origin
+      .style("fill", "Purple")
+      .style("font", "bold 12px Arial")
+      .text(function(d, i) { return selectedRegion[i]; }); //get the label from our original data array
 
-         // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
-         g.filter(function(d) { return d.endAngle - d.startAngle > .2; }).append("text")
-           .attr("dy", ".35em")
-           .attr("text-anchor", "middle")
-           //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
-           .attr("transform", function(d) { //set the label's origin to the center of the arc
-             //we have to make sure to set these before calling arc.centroid
-             d.radius = radius; // Set Outer Coordinate
-             d.innerRadius = radius/2; // Set Inner Coordinate
-             return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
-           })
-           .style("fill", "White")
-           .style("font", "bold 10px Arial")
-           .text(function(d) { return d.data; });
+    // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
+    g.filter(function(d) { return d.endAngle - d.startAngle > .2; }).append("text")
+      .attr("dy", ".35em")
+      .attr("text-anchor", "middle")
+      //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
+      .attr("transform", function(d) { //set the label's origin to the center of the arc
+        //we have to make sure to set these before calling arc.centroid
+        d.radius = radius; // Set Outer Coordinate
+        d.innerRadius = radius/2; // Set Inner Coordinate
+        return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+      })
+      .style("fill", "White")
+      .style("font", "bold 10px Arial")
+      .text(function(d) { return d.data; });
 
-         // Computes the angle of an arc, converting from radians to degrees.
-         function angle(d) {
-           var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
-           return a > 90 ? a - 180 : a;
-         }
+    // Computes the angle of an arc, converting from radians to degrees.
+    function angle(d) {
+      var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+      return a > 90 ? a - 180 : a;
+    }
 
 //Generate infobox
     function infoBox(d, population, density, hospitals){
       $('#info-box').html( function(){
-          return "<h3>"+d+"</h3>"+
+        return "<h3>"+d+"</h3>"+
           "<ul>"+
-            "<li>Population: " +population+ "</li>"+
-            "<li>Population Density: " +density+"</li>"+
-            "<li>Hospitals: " +hospitals+"</li>";
+          "<li>Population: " +population+ "</li>"+
+          "<li>Population Density: " +density+"</li>"+
+          "<li>Hospitals: " +hospitals+"</li>";
       });
     }
-
-
   });
+
+
+
+  /////////////////////////////////////
+
+
+  //Start Game
+  $("#start-btn").on("click", function(){
+    var day = 0;
+    var startRegion = "Bulkley_Nechako";
+    regionsData[startRegion].infectStatus = true;
+    regionsData[startRegion].direction = "center";
+
+    //When outbreak spread, you need to find the neighbours without being infected yet
+    function getCurrentNeighbors(currentRegion) {
+      var neighbours = neighborNames[currentRegion];
+      return neighbours.filter(function(name) {
+        return !regionsData[name].infectStatus;
+      });
+    }
+    //Make sure the game could stop looping when there is no more survivor
+    function survivorsLeft(){
+      return Object.keys(regionsData).some(function (key) {
+        return this[key].infectDegree < 100;
+      }, regionsData);
+    }
+
+    // Add infectDegree to infectStatus true regions + Spread outbreak to neighbours
+    function propagate(infectedRegionKey) {
+      var infectedRegion = this[infectedRegionKey];
+
+      if (infectedRegion.infectDegree < maxDegree) {
+        infectedRegion.infectDegree += infectionIncrement;
+      }
+      if (infectedRegion.infectDegree === infectionThreshold) {
+        var neighbourList = getCurrentNeighbors(infectedRegionKey);
+        function notInfectedNeighbourFilter(neighbour) {
+          return !this[neighbour].infectStatus;
+        }
+        function infectNeighbour(neighbour) {
+          this[neighbour].infectStatus = true;
+          this[neighbour].direction = neighborDirection[infectedRegionKey][neighbour];
+        }
+        neighbourList.filter(notInfectedNeighbourFilter, this).forEach(infectNeighbour, this);
+      }
+    }
+
+    //Animate color
+    function animate(record){
+      Object.keys(regionsData).forEach(
+        function(region){
+          var infectedRegion = this[region];
+          if(infectedRegion.infectStatus){
+            $("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
+          }
+        }
+        , record)
+    }
+
+    //Take snapshot of 0 day
+    infectionHistory[0] = {};
+    Object.keys(regionsData).forEach(function(region){
+      infectionHistory[0][region] = {};
+      infectionHistory[0][region]["infecStatus"] = regionsData[region]["infectStatus"];
+      infectionHistory[0][region]["infectDegree"] = regionsData[region]["infectDegree"];
+      infectionHistory[0][region]["direction"] = regionsData[region]["direction"];
+    });
+
+
+    //initialize the game properties
+    var infectionIncrement = 10;
+    var infectionThreshold = infectionIncrement * 4;
+    var maxDegree = 100;
+
+
+    //Game Logic
+    function infect() {
+      //1. Start a new day
+      ++day;
+      infectionHistory[day] = {};
+      console.log("day ", day);
+      //2. Run propagation to the regions with true infectStatus
+      Object.keys(regionsData).filter(function (region) {
+        return this[region].infectStatus;
+      }, regionsData).forEach(propagate, regionsData);
+      //3. Save snapshot of today's records of all the history
+      Object.keys(regionsData).forEach(function (regionKey) {
+        var region = this[regionKey];
+        infectionHistory[day][regionKey] = {
+          infectStatus: region.infectStatus,
+          infectDegree: region.infectDegree,
+          direction: region.direction
+        };
+      }, regionsData);
+
+      console.log("Day", day, " - infectHistory: ", infectionHistory);
+      //4. Animation
+      animate(infectionHistory[day]);
+
+      //5. if every regions is been infected, to 100 then game stop
+      if ( !survivorsLeft() || day === 28) {
+        console.log('Finish');
+        return;
+      }
+      //6. Run next day
+      setTimeout(function() {
+        infect();
+      }, 500);
+    }
+    //Run the game!!
+    infect();
+
+
+
+  })
+
 });

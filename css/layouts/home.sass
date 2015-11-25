@@ -54,3 +54,32 @@ body
   text-align: center
   color: #e74c3c
   text-shadow: 0 1px 1px rgba(0,0,0,.3)
+
+
+#clouds
+  border: solid 2px yellow
+  height: 500px
+  width: 500px
+  background-image:  url('https://dl.dropboxusercontent.com/u/32750720/cloud-1.png'), url('https://dl.dropboxusercontent.com/u/32750720/cloud-2.png')
+  background-position: 0 100%,100% 0
+  background-repeat: no-repeat
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  margin: auto
+  transform: translateZ(50px)
+  pointer-events: none
+  animation: cloud-rotate-h 160s linear infinite
+  transition: all 5s
+
+
+@keyframes cloud-rotate-h
+0%
+  transform: translateZ(50px) rotate(0deg)
+50%
+  transform: translateZ(50px) rotate(180deg)
+  width: 60%
+100%
+  transform: translateZ(50px) rotate(360deg)
