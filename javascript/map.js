@@ -60,9 +60,9 @@ d3.csv("RegionsBC.csv", function (data) {
     };
 
     function survivalRate(population, density, hospital, bears, goats, caribou, deer){
-      return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02)
+      return population*(-0.000001)+density*(-0.001)+hospital*(3)+bears*(-0.001)+goats*(0.001)+caribou*(0.002)+deer*(0.002)
     }
-
+    //TODO fix number, add police station or rescue station? supermarkets?
 
 
 //Set Projection and get the neighbours list(but only with number)
@@ -435,17 +435,16 @@ $(function () {
     }
 
 //Generate infobox
-    function infoBox(d, population, density, hospitals) {
-      $('#info-box').html(function () {
-        return "<h3>" + d + "</h3>" +
-          "<ul>" +
-
-          "<li>Population: " + population + "</li>" +
-          "<li>Population Density: " + density + "</li>" +
-          "<li>Hospitals: " + hospitals + "</li>" +
-          "<p>Is this where you'd like to hide out?" +
-          "<button class='btn' id='select-btn'>Yes</button>" +
-          "</p>";
+    function infoBox(d, population, density, hospitals){
+      $('#info-box').html( function(){
+          return "<h3>"+d+"</h3>"+
+          "<ul>"+
+            "<li>Population: " +population+ "</li>"+
+            "<li>Population Density: " +density+"</li>"+
+            "<li>Hospitals: " +hospitals+"</li></ul>"+
+            "<p>Is this where you'd like to hide out?"+
+              "<button class='btn' id='select-btn'>Yes</button>"+
+            "</p>";
       });
     }
 
