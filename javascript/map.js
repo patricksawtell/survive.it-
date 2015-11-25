@@ -466,13 +466,17 @@ $(function () {
   //Start Game
   $("#info-box").on("click","#select-btn", function(){
     var day = 0;
-    var startRegion = currentRegion;
+
+    //randomizer for starting location
+    var array = $.map(regionsData, function(value, index) {return index});
+    var ind = Math.floor(Math.random()*(29)+1);
+    var startRegion = array[ind];
     regionsData[startRegion].infectStatus = true;
     regionsData[startRegion].direction = "center";
 
     //When outbreak spread, you need to find the neighbours without being infected yet
-    function getCurrentNeighbors(currentRegion) {
-      var neighbours = neighborNames[currentRegion];
+    function getCurrentNeighbors(region) {
+      var neighbours = neighborNames[region];
       return neighbours.filter(function(name) {
         return !regionsData[name].infectStatus;
       });
@@ -489,9 +493,10 @@ $(function () {
       var infectedRegion = this[infectedRegionKey];
 
       if (infectedRegion.infectDegree < maxDegree) {
-        infectedRegion.infectDegree += infectionIncrement;
+        infectedRegion.infectDegree += infectionIncrement(infectedRegion);
+        //debugger
       }
-      if (infectedRegion.infectDegree === infectionThreshold) {
+      if (infectedRegion.infectDegree > infectionThreshold) {
         var neighbourList = getCurrentNeighbors(infectedRegionKey);
         function notInfectedNeighbourFilter(neighbour) {
           return !this[neighbour].infectStatus;
@@ -501,6 +506,40 @@ $(function () {
           this[neighbour].direction = neighborDirection[infectedRegionKey][neighbour];
         }
         neighbourList.filter(notInfectedNeighbourFilter, this).forEach(infectNeighbour, this);
+      }
+    }
+
+    // User survival related logic
+    var userAlive = true;
+    var deathDate;
+
+    function checkSurvival(region, day){
+
+      var infectLevel = region.infectDegree; //always increasing
+      var survivalRate = region.survivalrate; //always decreasing
+      var maxSurvive = 100;
+      var minSurvive = infectLevel + day*1.5; //gets harder to survive as time passes
+
+      if (randomSurvival(survivalRate,maxSurvive) > minSurvive ){ //rolls to check to see if user is alive
+        return true;
+      } else {
+        debugger
+        deathDate = day;
+        return false;
+      }
+    }
+
+    function randomSurvival(min,max) {
+      return Math.floor(Math.random()*(max-min+1)+min);
+    }
+
+    //provide ending
+
+    function selectEnding(userAlive, deathDate){
+      if (userAlive){
+        console.log("simulation ends, user is alive!")
+      } else {
+        console.log("simulation ends, unfortunately user was dead on day " + deathDate)
       }
     }
 
@@ -525,10 +564,15 @@ $(function () {
       infectionHistory[0][region]["direction"] = regionsData[region]["direction"];
     });
 
+    //infection increment function
+    function infectionIncrement(region){
+      return Math.min(Math.log(region.population),30)+Math.min(Math.log(region.density),15)-region.hospitals
+    }
 
     //initialize the game properties
-    var infectionIncrement = 10;
-    var infectionThreshold = infectionIncrement * 4;
+    //var infectionIncrement = 10;
+    //var infectionThreshold = infectionIncrement * 4;
+    var infectionThreshold = 40;
     var maxDegree = 100;
 
 
@@ -555,10 +599,16 @@ $(function () {
       console.log("Day", day, " - infectHistory: ", infectionHistory);
       //4. Animation
       animate(infectionHistory[day]);
+//debugger
+      //4.5 check user survival
+      if (userAlive === true){
+        userAlive = checkSurvival(regionsData[currentRegion], day)
+      }
 
       //5. if every regions is been infected, to 100 then game stop
       if ( !survivorsLeft() || day === 28) {
         console.log('Finish');
+        selectEnding(userAlive,deathDate);
         return;
       }
       //6. Run next day
