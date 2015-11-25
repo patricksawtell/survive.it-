@@ -25,7 +25,7 @@ $(document).ready(function() {
   });
 
 // Toggle filter and header
-  $('#select-btn').on('click', function(){
+  $('p #select-btn').on('click', function(){
     $("#side-nav").css("visibility", "hidden");
     $(".header").slideUp("slow");
   })

@@ -375,7 +375,7 @@ $(function () {
           "<ul>"+
             "<li>Population: " +population+ "</li>"+
             "<li>Population Density: " +density+"</li>"+
-            "<li>Hospitals: " +hospitals+"</li>"+
+            "<li>Hospitals: " +hospitals+"</li></ul>"+
             "<p>Is this where you'd like to hide out?"+
               "<button class='btn' id='select-btn'>Yes</button>"+
             "</p>";
