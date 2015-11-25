@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Survive.it</title>
+	<link rel="stylesheet" href="css/app.css">
+	<link href='https://fonts.googleapis.com/css?family=Ubuntu:400,500,700' rel='stylesheet' type='text/css'>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
+	<script src="javascript/popup.js"></script>
+	<script src="javascript/jquery.typist.js"></script>
+	<script src="javascript/main.js"></script>
+	<script src="D3_map/node_modules/topojson/topojson.js"></script>
+	<script src="//d3js.org/topojson.v1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+	<script type="text/javascript" src="D3_map/d3/d3.min.js"></script>
+</head>
+
+<div class="container">
+	<div id="boxes">
+		<div id="dialog" class="window">
+			<p class="typist"></p>
+			<div id="popupfoot">
+				<button class="btn-popup">Vancouver</button>
+				<button class="btn-popup">Prince George</button>
+				<button class="btn-popup">Whistler</button>
+			</div>
+		</div>
+		<div id="mask"></div>
+	</div>
+	<div class = "main">
+		<div id = "side-nav">
+			<h3 id="filter">Filters</h3>
+			<ul class="tg-list">
+				<li class="tg-list-item btn-home toggle">
+					<p>Population</p>
+					<input type="checkbox" data-toggle="#population" class="tgl tgl-flat" id="cb1">
+					<label class="tgl-btn" for ="cb1"></label>
+				</li>
+
+				<li class="tg-list-item btn-home toggle">
+					<p>Population Density</p>
+					<input type="checkbox" data-toggle="#density" class="tgl tgl-flat" id="cb2">
+					<label class="tgl-btn" for ="cb2"></label>
+				</li>
+
+				<li class="tg-list-item btn-home toggle">
+					<p>Hospitals</p>
+					<input type="checkbox" data-toggle="#hospitals" class="tgl tgl-flat" id="cb3">
+					<label class="tgl-btn" for ="cb3"></label>
+				</li>
+
+				<li class="tg-list-item btn-home toggle">
+					<p>Wildlife</p>
+					<input type="checkbox" data-toggle="#wildlife" class="tgl tgl-flat" id="cb4">
+					<label class="tgl-btn" for ="cb4"></label>
+				</li>
+
+				<li class="tg-list-item btn-home toggle">
+					<p>Bears</p>
+					<input type="checkbox" data-toggle="#bears" class="tgl tgl-flat" id="cb5">
+					<label class="tgl-btn" for ="cb5"></label>
+				</li>
+
+				<li class="tg-list-item btn-home toggle">
+					<p>Goats</p>
+					<input type="checkbox" data-toggle="#goats" class="tgl tgl-flat" id="cb6">
+					<label class="tgl-btn" for ="cb6"></label>
+				</li>
+
+				<li class="tg-list-item btn-home toggle">
+					<p>Caribou</p>
+					<input type="checkbox" data-toggle="#caribou" class="tgl tgl-flat" id="cb7">
+					<label class="tgl-btn" for ="cb7"></label>
+				</li>
+
+				<li class="tg-list-item btn-home toggle">
+					<p>Deer</p>
+					<input type="checkbox" data-toggle="#deer" class="tgl tgl-flat" id="cb8">
+					<label class="tgl-btn" for ="cb8"></label>
+				</li>
+			</ul>
+		</div>
+
+		<div id="map">
+			<script type="text/javascript" src="javascript/map.js"></script>
+			<div id="tooltip"></div>
+		</div>
+
+		<div id="info-box">
+
+		</div>
+	</div>
+	</body>
+</html>
