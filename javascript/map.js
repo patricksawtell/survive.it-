@@ -354,12 +354,8 @@ $(function () {
     var selectedRegion = regionsData[currentRegion];
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
 
-<<<<<<< HEAD
-    $('#info-box').html(infoBox(currentRegion, regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
-=======
-    $('#info-box').html(infoBox(currentRegion.split("_").join(" "), regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
 
->>>>>>> b21e0112206760bdb41dfa68575bf96afc44892e
+    $('#info-box').html(infoBox(currentRegion.split("_").join(" "), regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
 
 // Create graphs for each region
     var width = 200,
