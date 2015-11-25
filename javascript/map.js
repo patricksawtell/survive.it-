@@ -60,9 +60,9 @@ d3.csv("RegionsBC.csv", function (data) {
     };
 
     function survivalRate(population, density, hospital, bears, goats, caribou, deer){
-      return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02)
+      return population*(-0.000001)+density*(-0.001)+hospital*(3)+bears*(-0.001)+goats*(0.001)+caribou*(0.002)+deer*(0.002)
     }
-
+    //TODO fix number, add police station or rescue station? supermarkets?
 
 
 //Set Projection and get the neighbours list(but only with number)
@@ -91,7 +91,7 @@ d3.csv("RegionsBC.csv", function (data) {
       return "<h4>"+d+"</h4><table>"+
         "<tr><td>Population</td><td>"+population+"</td></tr>"+
         "</table>";
-    }
+    };
     toolTip();
 
 // Draws the map regions
@@ -494,6 +494,7 @@ $(function () {
 
       if (infectedRegion.infectDegree < maxDegree) {
         infectedRegion.infectDegree += infectionIncrement(infectedRegion);
+        console.log(infectionIncrement(infectedRegion));
         //debugger
       }
       if (infectedRegion.infectDegree > infectionThreshold) {
@@ -566,7 +567,7 @@ $(function () {
 
     //infection increment function
     function infectionIncrement(region){
-      return Math.min(Math.log(region.population),30)+Math.min(Math.log(region.density),15)-region.hospitals
+      return Math.log(region.population)+Math.log(region.density)+region.infectDegree*0.02//-region.hospitals
     }
 
     //initialize the game properties
@@ -587,6 +588,7 @@ $(function () {
         return this[region].infectStatus;
       }, regionsData).forEach(propagate, regionsData);
       //3. Save snapshot of today's records of all the history
+      //debugger
       Object.keys(regionsData).forEach(function (regionKey) {
         var region = this[regionKey];
         infectionHistory[day][regionKey] = {
