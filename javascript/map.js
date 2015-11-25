@@ -5,10 +5,7 @@ var svg = d3.select("#map")
   .attr("height", 500)
   .attr("viewBox", "-3160 -1725 655 527")
 
-
 var neighborNames;
-var centered;
-
 var mapJ = svg.append("g").attr("id", "main");
 var densityLayer = svg.append("g").attr("id", "density");
 var populationLayer = svg.append("g").attr("id", "population");
@@ -52,14 +49,12 @@ d3.csv("RegionsBC.csv", function (data) {
       regionsData[regionName]['deer'] = +regionDeer;
       regionsData[regionName]['caribou'] = +regionCaribou;
     };
+      //regionsData[regionName]['survivalrate'] = survivalRate(regionPopulation,regionDensity,regionHospitals,regionBears,regionGoats,regionCaribou,regionDeer )
+    //
+    //function survivalRate(population, density, hospital, bears, goats, caribou, deer){
+    //  return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02)
+    //}
 
-
-    regionsData[regionName]['survivalrate'] = survivalRate(regionPopulation,regionDensity,regionHospitals,regionBears,regionGoats,regionCaribou,regionDeer)
-
-//Calculate survival rate
-    function survivalRate(population, density, hospital, bears, goats, caribou, deer){
-      return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02);
-    };
 
 
 //Draw the map
