@@ -3,23 +3,6 @@ $(document).ready(function() {
     $(this).toggleClass('filter')
   });
 
-  var $sidebar   = $("#side-nav"),
-        $window    = $(window),
-        offset     = $sidebar.offset(),
-        topPadding = 15;
-
-    $window.scroll(function() {
-        if ($window.scrollTop() > offset.top) {
-            $sidebar.stop().animate({
-                marginTop: $window.scrollTop() - offset.top + topPadding
-            });
-        } else {
-            $sidebar.stop().animate({
-                marginTop: 5
-            });
-        }
-    });
-
   d3.selection.prototype.moveToFront = function() {
     return this.each(function(){
       this.parentNode.appendChild(this);
@@ -41,5 +24,11 @@ $(document).ready(function() {
       $(self).siblings().not("#main").attr("style","display: none");
     });
   });
+
+// Toggle filter and header
+  $('#select-btn').on('click', function(){
+    $("#side-nav").css("visibility", "hidden");
+    $(".header").slideUp("slow");
+  })
 
 });

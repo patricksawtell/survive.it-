@@ -348,14 +348,18 @@ d3.csv("RegionsBC.csv", function (data) {
 $(function () {
   $('svg').on('click','path', function(){
     $('#info-box').slideDown("swing", 4000)
-
     $(this).attr('id');
 
     var currentRegion =  $(this).attr('id');
     var selectedRegion = regionsData[currentRegion];
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
 
+<<<<<<< HEAD
     $('#info-box').html(infoBox(currentRegion, regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
+=======
+    $('#info-box').html(infoBox(currentRegion.split("_").join(" "), regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
+
+>>>>>>> b21e0112206760bdb41dfa68575bf96afc44892e
 
 // Create graphs for each region
     var width = 200,
@@ -437,13 +441,15 @@ $(function () {
       $('#info-box').html( function(){
         return "<h3>"+d+"</h3>"+
           "<ul>"+
-          "<li>Population: " +population+ "</li>"+
-          "<li>Population Density: " +density+"</li>"+
-          "<li>Hospitals: " +hospitals+"</li>";
+
+            "<li>Population: " +population+ "</li>"+
+            "<li>Population Density: " +density+"</li>"+
+            "<li>Hospitals: " +hospitals+"</li>"+
+            "<p>Is this where you'd like to hide out?"+
+              "<button class='btn' id='select-btn'>Yes</button>"+
+            "</p>";
       });
     }
-  });
-
 
 
   /////////////////////////////////////
