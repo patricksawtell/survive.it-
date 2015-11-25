@@ -22,7 +22,7 @@
 		}
 
 		svg {
-			background-color:#005F80;
+			background-color:#FFF;
 		}
 
 		.clouds{
@@ -412,6 +412,18 @@
 				}
 			}
 
+			//Animate color
+			function animate(record){
+				Object.keys(regionsData).forEach(
+					function(region){
+						var infectedRegion = this[region];
+						if(infectedRegion.infectStatus){
+							$("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
+						}
+					}
+				, record)
+			}
+
 			//Take snapshot of 0 day
 			infectionHistory[0] = {};
 			Object.keys(regionsData).forEach(function(region){
@@ -423,8 +435,8 @@
 
 
 			//initialize the game properties
-			var infectionIncrement = 20;
-			var infectionThreshold = infectionIncrement * 2;
+			var infectionIncrement = 10;
+			var infectionThreshold = infectionIncrement * 4;
 			var maxDegree = 100;
 			//Start Game Logic
 
@@ -450,7 +462,7 @@
 
 				console.log("Day", day, " - infectHistory: ", infectionHistory);
 				//4. Animation
-//					ChangeColor(record);
+				animate(infectionHistory[day]);
 
 				//5. if every regions is been infected, to 100 then game stop
 				if ( !survivorsLeft() || day === 28) {
