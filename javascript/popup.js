@@ -42,11 +42,9 @@ $(document).ready(function() {
   });
 
   function showDialogue(){
-    $("#popupfoot").hide()
     $('.typist').typist({ speed: 12 })
     .typistPause(2000) // 3 sec
     .typistAdd('Hello? Are you there?\n', function() {
-      $("#popupfoot").fadeIn("slow");
 
     })
     // .typistPause(2000) // 2 sec
