@@ -1,4 +1,4 @@
-var width = 700;
+var width = 900;
 var height = 700;
 var regionsData = {};
 var svg = d3.select("#map")
@@ -7,7 +7,6 @@ var svg = d3.select("#map")
   .attr("height", height);
 
 
-var mapB = svg.append("g").attr("id", "background");
 var mapJ = svg.append("g").attr("id", "main");
 
 var densityLayer = svg.append("g").attr("id", "density");
@@ -74,9 +73,9 @@ d3.csv("RegionsBC.csv", function (data) {
 //Tooltip Functionality
 
     function mouseOver(d){
-      var regionName = d.properties.CDNAME
-      var population = regionsData[regionName]['population']
-      displayName = regionName.split("_").join(" ")
+      var regionName = d.properties.CDNAME;
+      var population = regionsData[regionName]['population'];
+      displayName = regionName.split("_").join(" ");
       d3.select("#tooltip").transition().duration(200).style("opacity", .9);
       d3.select("#tooltip").html(toolTip(displayName, population))
         .style("left", (d3.event.pageX) + "px")
@@ -91,16 +90,9 @@ d3.csv("RegionsBC.csv", function (data) {
       return "<h4>"+d+"</h4><table>"+
         "<tr><td>Population</td><td>"+population+"</td></tr>"+
         "</table>";
-    }
+    };
     toolTip();
 
-// Draws the map regions
-    mapB.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("class", "background");
 
     mapJ.selectAll("path")
       .data(featureCollection.features)
@@ -113,8 +105,6 @@ d3.csv("RegionsBC.csv", function (data) {
       .attr("class", "region")
       .on("mouseover", mouseOver).on("mouseout", mouseOut);
 
-//Draw Cloud
-//    $('<div>').addClass('clouds').text('Hi').appendTo($('body'));
 
 //Generate layers for filters
     populationLayer.selectAll("path")
@@ -245,10 +235,10 @@ d3.csv("RegionsBC.csv", function (data) {
       })[1];
       result.width = result.maxX - result.minX;
       result.height = result.maxY - result.minY;
-      var marginW = result.width * 0.1;
-      var marginH = result.height * 0.1;
+      var marginW = result.width * 0.05;
+      var marginH = result.height * 0.05;
 
-      var viewBox = (result.minX - marginW) + ' ' + (result.minY - marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
+      var viewBox = (result.minX - marginW) + ' ' + (result.minY + marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
       return viewBox;
     }
     //Set the view Box
@@ -510,7 +500,10 @@ $(function () {
         function(region){
           var infectedRegion = this[region];
           if(infectedRegion.infectStatus){
-            $("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
+            var degree = infectedRegion.infectDegree;
+            var colorBA = 255/100;
+            var colorNum = 255 - colorBA*degree;
+            $("#"+ region).css({"fill": "rgb(255," + colorNum + ',' + colorNum +")"});
           }
         }
         , record)

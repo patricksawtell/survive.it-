@@ -235,18 +235,20 @@ body {
   #map:last-child {
     margin-right: 0; }
 
-#side-nav {
-  margin: 5px;
-  border: solid 1px white;
-  border-radius: 10px;
-  background: rgba(54, 25, 25, 0.5);
+#side {
   float: left;
   display: block;
   margin-right: 2.35765%;
   width: 14.70196%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
-  #side-nav:last-child {
+  margin: 5px; }
+  #side:last-child {
     margin-right: 0; }
+
+#side-nav {
+  border: solid 1px white;
+  border-radius: 10px;
+  background: rgba(54, 25, 25, 0.5);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
   #side-nav .tg-list .tg-list-item {
     width: 100%;
     display: flex;
@@ -263,7 +265,7 @@ body {
   float: left;
   display: block;
   margin-right: 2.35765%;
-  width: 40.29137%;
+  width: 23.23176%;
   float: right; }
   #info-box:last-child {
     margin-right: 0; }
@@ -280,7 +282,7 @@ body {
   background-position: 0 100%, 100% 0;
   background-repeat: no-repeat;
   position: absolute;
-  top: 0;
+  top: 200px;
   left: 0;
   right: 0;
   bottom: 0;

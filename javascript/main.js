@@ -10,7 +10,6 @@ $(document).ready(function() {
   };
 //setting default svg status
   $('g').not("#main").attr("style","display: none");
-  $("#background").attr("style","display: inherit");
 
   $('.tgl.tgl-flat').on('click', function(){
     var self = $(this).data("toggle");
@@ -25,10 +24,18 @@ $(document).ready(function() {
     });
   });
 
-// Toggle filter and header
-  $('#select-btn').on('click', function(){
-    $("#side-nav").css("visibility", "hidden");
-    $(".header").slideUp("slow");
+// Toggle filter
+  $("#info-box").on("click","#select-btn", function(){
+    $("#side-nav").slideUp("fast");
+    $('g').not("#main").attr("style","display: none");
+    var board = $("<div>").css({
+      "border": "solid 2px white",
+      "border-radius": "10px",
+      "width": "95%",
+      "height": "300px",
+      "margin": "10px auto"
+    });
+    $("#side").append(board)
   })
 
 });
