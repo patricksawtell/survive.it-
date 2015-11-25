@@ -10,6 +10,7 @@ $(document).ready(function() {
   };
 //setting default svg status
   $('g').not("#main").attr("style","display: none");
+  $("#background").attr("style","display: inherit");
 
   $('.tgl.tgl-flat').on('click', function(){
     var self = $(this).data("toggle");

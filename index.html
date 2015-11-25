@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<title>Survive.it</title>
 	<link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/keyframes.css">
 	<link href='https://fonts.googleapis.com/css?family=Ubuntu:400,500,700' rel='stylesheet' type='text/css'>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
 	<script src="javascript/popup.js"></script>
@@ -13,21 +14,24 @@
 	<script src="//d3js.org/topojson.v1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
 	<script type="text/javascript" src="D3_map/d3/d3.min.js"></script>
+
 </head>
 
 <div class="container">
 	<div id="boxes">
 		<div id="dialog" class="window">
 			<p class="typist"></p>
-			<div id="popupfoot">
-				<button class="btn-popup">Vancouver</button>
-				<button class="btn-popup">Prince George</button>
-				<button class="btn-popup">Whistler</button>
-			</div>
 		</div>
 		<div id="mask"></div>
 	</div>
 	<div class = "main">
+
+		<div class="header">
+			<h1> Survive.it
+				<button class="btn" id ="start-btn">Start Infection</button>
+			</h1>
+		</div>
+
 		<div id = "side-nav">
 			<h3 id="filter">Filters</h3>
 			<ul class="tg-list">
@@ -60,24 +64,6 @@
 					<input type="checkbox" data-toggle="#bears" class="tgl tgl-flat" id="cb5">
 					<label class="tgl-btn" for ="cb5"></label>
 				</li>
-
-				<li class="tg-list-item btn-home toggle">
-					<p>Goats</p>
-					<input type="checkbox" data-toggle="#goats" class="tgl tgl-flat" id="cb6">
-					<label class="tgl-btn" for ="cb6"></label>
-				</li>
-
-				<li class="tg-list-item btn-home toggle">
-					<p>Caribou</p>
-					<input type="checkbox" data-toggle="#caribou" class="tgl tgl-flat" id="cb7">
-					<label class="tgl-btn" for ="cb7"></label>
-				</li>
-
-				<li class="tg-list-item btn-home toggle">
-					<p>Deer</p>
-					<input type="checkbox" data-toggle="#deer" class="tgl tgl-flat" id="cb8">
-					<label class="tgl-btn" for ="cb8"></label>
-				</li>
 			</ul>
 		</div>
 
@@ -87,8 +73,10 @@
 		</div>
 
 		<div id="info-box">
-
 		</div>
 	</div>
-	</body>
+
+</div>
+<div id="clouds"></div>
+</body>
 </html>
