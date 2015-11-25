@@ -55,7 +55,6 @@ body
 
 
 #clouds
-  border: solid 2px yellow
   height: 500px
   width: 500px
   background-image:  url('https://dl.dropboxusercontent.com/u/32750720/cloud-1.png'), url('https://dl.dropboxusercontent.com/u/32750720/cloud-2.png')
@@ -71,16 +70,6 @@ body
   pointer-events: none
   animation: cloud-rotate-h 160s linear infinite
   transition: all 5s
-
-
-@keyframes cloud-rotate-h
-0%
-  transform: translateZ(50px) rotate(0deg)
-50%
-  transform: translateZ(50px) rotate(180deg)
-  width: 60%
-100%
-  transform: translateZ(50px) rotate(360deg)
 
 #city-select
   visibility: hidden

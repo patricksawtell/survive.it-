@@ -346,11 +346,10 @@ d3.csv("RegionsBC.csv", function (data) {
 
 //$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 $(function () {
-  $('svg').on('click','path', function(){
-    $('#info-box').slideDown("swing", 4000)
-    $(this).attr('id');
-
-    var currentRegion =  $(this).attr('id');
+  var currentRegion;
+  $('svg').on('click','path', function() {
+    $('#info-box').slideDown("swing", 4000);
+    currentRegion = $(this).attr('id');
     var selectedRegion = regionsData[currentRegion];
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
 
@@ -373,7 +372,9 @@ $(function () {
 
     var pie = d3.layout.pie()
       .sort(null)
-      .value(function(d) { return d;});
+      .value(function (d) {
+        return d;
+      });
 
     var svg = d3.select("#info-box").append("svg")
       .attr("width", width)
@@ -388,19 +389,24 @@ $(function () {
 
     g.append("path")
       .attr("d", arc)
-      .style("fill", function(d) {
-        return color(d.data); });
+      .style("fill", function (d) {
+        return color(d.data);
+      });
 
 // Generate labels for charts
 
     g.append("text")
-      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+      .attr("transform", function (d) {
+        return "translate(" + arc.centroid(d) + ")";
+      })
       .attr("dy", ".35em")
       .style("text-anchor", "middle")
-      .text(function(d) { return graphData.label; });
+      .text(function (d) {
+        return graphData.label;
+      });
 
     g.append("text")
-      .attr("transform", function(d) { //set the label's origin to the center of the arc
+      .attr("transform", function (d) { //set the label's origin to the center of the arc
         //we have to make sure to set these before calling arc.centroid
         d.radius = radius + 50; // Set Outer Coordinate
         d.innerRadius = radius + 45; // Set Inner Coordinate
@@ -409,22 +415,28 @@ $(function () {
       .attr("text-anchor", "middle") //center the text on it's origin
       .style("fill", "Purple")
       .style("font", "bold 12px Arial")
-      .text(function(d, i) { return selectedRegion[i]; }); //get the label from our original data array
+      .text(function (d, i) {
+        return selectedRegion[i];
+      }); //get the label from our original data array
 
     // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
-    g.filter(function(d) { return d.endAngle - d.startAngle > .2; }).append("text")
+    g.filter(function (d) {
+      return d.endAngle - d.startAngle > .2;
+    }).append("text")
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
       //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
-      .attr("transform", function(d) { //set the label's origin to the center of the arc
+      .attr("transform", function (d) { //set the label's origin to the center of the arc
         //we have to make sure to set these before calling arc.centroid
         d.radius = radius; // Set Outer Coordinate
-        d.innerRadius = radius/2; // Set Inner Coordinate
+        d.innerRadius = radius / 2; // Set Inner Coordinate
         return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
       })
       .style("fill", "White")
       .style("font", "bold 10px Arial")
-      .text(function(d) { return d.data; });
+      .text(function (d) {
+        return d.data;
+      });
 
     // Computes the angle of an arc, converting from radians to degrees.
     function angle(d) {
@@ -433,28 +445,28 @@ $(function () {
     }
 
 //Generate infobox
-    function infoBox(d, population, density, hospitals){
-      $('#info-box').html( function(){
-        return "<h3>"+d+"</h3>"+
-          "<ul>"+
+    function infoBox(d, population, density, hospitals) {
+      $('#info-box').html(function () {
+        return "<h3>" + d + "</h3>" +
+          "<ul>" +
 
-            "<li>Population: " +population+ "</li>"+
-            "<li>Population Density: " +density+"</li>"+
-            "<li>Hospitals: " +hospitals+"</li>"+
-            "<p>Is this where you'd like to hide out?"+
-              "<button class='btn' id='select-btn'>Yes</button>"+
-            "</p>";
+          "<li>Population: " + population + "</li>" +
+          "<li>Population Density: " + density + "</li>" +
+          "<li>Hospitals: " + hospitals + "</li>" +
+          "<p>Is this where you'd like to hide out?" +
+          "<button class='btn' id='select-btn'>Yes</button>" +
+          "</p>";
       });
     }
 
+  });
 
-  /////////////////////////////////////
 
 
   //Start Game
-  $("#start-btn").on("click", function(){
+  $("#info-box").on("click","#select-btn", function(){
     var day = 0;
-    var startRegion = "Bulkley_Nechako";
+    var startRegion = currentRegion;
     regionsData[startRegion].infectStatus = true;
     regionsData[startRegion].direction = "center";
 
