@@ -445,17 +445,16 @@ $(function () {
     }
 
 //Generate infobox
-    function infoBox(d, population, density, hospitals) {
-      $('#info-box').html(function () {
-        return "<h3>" + d + "</h3>" +
-          "<ul>" +
-
-          "<li>Population: " + population + "</li>" +
-          "<li>Population Density: " + density + "</li>" +
-          "<li>Hospitals: " + hospitals + "</li>" +
-          "<p>Is this where you'd like to hide out?" +
-          "<button class='btn' id='select-btn'>Yes</button>" +
-          "</p>";
+    function infoBox(d, population, density, hospitals){
+      $('#info-box').html( function(){
+          return "<h3>"+d+"</h3>"+
+          "<ul>"+
+            "<li>Population: " +population+ "</li>"+
+            "<li>Population Density: " +density+"</li>"+
+            "<li>Hospitals: " +hospitals+"</li></ul>"+
+            "<p>Is this where you'd like to hide out?"+
+              "<button class='btn' id='select-btn'>Yes</button>"+
+            "</p>";
       });
     }
 
