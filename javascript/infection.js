@@ -22,7 +22,7 @@ $(function() {
       "height": "500px",
       "margin": "10px auto",
       "overflow-y": "scroll"
-    }).attr("id", "board");
+    }).attr("id", "board")
     $("#side").append(board);
 
 
