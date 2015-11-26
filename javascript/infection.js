@@ -90,7 +90,7 @@ $(function() {
         return true;
       } else {
         deathDate = day;
-        debugger
+        //debugger
         return false;
       }
     }
@@ -226,12 +226,23 @@ $(function() {
           "<br>" +
           "<button class='btn' id='restart-btn'>Restart</button>" +
           "</div>");
-        canSelectRegion = true;
+
+        //$("#main").attr('disabled', 'disabled');
+        //var event = $(document).click(function(e) {
+        //  e.stopPropagation();
+        //  e.preventDefault();
+        //  e.stopImmediatePropagation();
+        //  return false;
+        //});
+
+
 
         $('#restart-btn').on('click',function(){
           //debugger
+          //$("#main").removeAttr('disabled');
+          canSelectRegion = true;
           $(".tgl.tgl-flat").prop("checked", false);
-          $('#slider-box').remove();
+          $('#slider-box').hide();
           $('#restartButton').remove();
           for (key in regionsData) {
             regionsData[key].infectStatus = false;
@@ -246,6 +257,7 @@ $(function() {
         });
 
         //Slider Show on Completion
+        $('#slider-box').show();
         $('#slider').show();
         $('#slider').val(28);
         return;
