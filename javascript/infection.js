@@ -222,7 +222,7 @@ $(function() {
       if (!survivorsLeft() || day === 28) {
         console.log('Finish');
         selectEnding(userAlive, deathDate);
-        $("#info-box").append("<div id='restartButton'>Restart?" +
+        $("#side").append("<div id='restartButton'>Restart?" +
           "<br>" +
           "<button class='btn' id='restart-btn'>Restart</button>" +
           "</div>");
