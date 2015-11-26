@@ -22,6 +22,29 @@ var deerLayer = svg.append("g").attr("id", "deer");
 var neighborNames;
 var neighborDirection;
 var infectionHistory = [];
+var redraw;
+var propColor = {
+  Population: {
+    min: "#D3D3C1",
+    max: "#6F6F33"
+  },
+  Density: {
+    min: "#CCE5FF",
+    max: "#0000FF"
+  },
+  Wildlife: {
+    min: "#FFFFFF",
+    max: "#006600"
+  },
+  Hospitals: {
+    min: "#FFFFFF",//"#E5CCFF",
+    max: "#8C2B3A"
+  },
+  Bears: {
+    min: "#FFFFFF",
+    max: "#EEA74F"
+  }
+};
 var currentRegion;
 var canSelectRegion = true;
 
@@ -30,7 +53,6 @@ var canSelectRegion = true;
 
 d3.csv("RegionsBC.csv", function (data) {
   d3.json("bc29.topo.json", function (map) {
-
     //Initialize the region data in hash
     var geometries =map.objects.bc_29_crs84.geometries;
     geometries.forEach(function(region){
@@ -61,7 +83,7 @@ d3.csv("RegionsBC.csv", function (data) {
       regionsData[regionName]['deer'] = +regionDeer;
       regionsData[regionName]['caribou'] = +regionCaribou;
       regionsData[regionName]['survivalrate'] = survivalRate(regionPopulation,regionDensity,regionHospitals,regionBears,regionGoats,regionCaribou,regionDeer )
-    };
+    }
 
     function survivalRate(population, density, hospital, bears, goats, caribou, deer){
       return population*(-0.000001)+density*(-0.001)+hospital*(3)+bears*(-0.001)+goats*(0.001)+caribou*(0.002)+deer*(0.002)
@@ -99,6 +121,14 @@ d3.csv("RegionsBC.csv", function (data) {
     toolTip();
 
 // Draws the map regions
+
+//    mapB.selectAll("path")
+//      .data(featureCollection.features)
+//      .enter()
+//      .append("path")
+//      .attr("d", path)
+//      .attr("class", "background");
+
     mapJ.selectAll("path")
       .data(featureCollection.features)
       .enter()
@@ -115,72 +145,97 @@ d3.csv("RegionsBC.csv", function (data) {
 
 
 //Generate layers for filters
-    populationLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var population = regionsData[name].population;
-        return getColorLog(population, 'Population')
-      })
-      .style("opacity", 1);
+//    populationLayer.selectAll("path")
+//      .data(featureCollection.features)
+//      .enter()
+//      .append("path")
+//      .attr("d", path)
+//      .attr("id", getGeoName)
+//      .style("fill", function(d){
+//        var name = d.properties.CDNAME;
+//        var population = regionsData[name].population;
+//        return getColorLog(population, 'Population')
+//      })
+//      .style("opacity", 1);
+//
+//    densityLayer.selectAll("path")
+//      .data(featureCollection.features)
+//      .enter()
+//      .append("path")
+//      .attr("d", path)
+//      .attr("id", getGeoName)
+//      .style("fill", function(d){
+//        var name = d.properties.CDNAME;
+//        var density = regionsData[name].density;
+//        return getColorLog(density, 'Density')
+//      })
+//      .style("opacity", 1);
+//
+//    hospitalsLayer.selectAll("path")
+//      .data(featureCollection.features)
+//      .enter()
+//      .append("path")
+//      .attr("d", path)
+//      .attr("id", getGeoName)
+//      .style("fill", function(d){
+//        var name = d.properties.CDNAME;
+//        var hospitals = regionsData[name].hospitals;
+//        return getColorLinear(hospitals, 'Hospitals')
+//      })
+//      .style("opacity", 1);
+//
+//    wildlifeLayer.selectAll("path")
+//      .data(featureCollection.features)
+//      .enter()
+//      .append("path")
+//      .attr("d", path)
+//      .attr("id", getGeoName)
+//      .style("fill", function(d){
+//        var name = d.properties.CDNAME;
+//        var wildlife = regionsData[name].wildlife;
+//        return getColorLinear(wildlife, 'Wildlife')
+//      })
+//      .style("opacity", 1);
+//
+//    bearsLayer.selectAll("path")
+//      .data(featureCollection.features)
+//      .enter()
+//      .append("path")
+//      .attr("d", path)
+//      .attr("id", getGeoName)
+//      .style("fill", function(d){
+//        var name = d.properties.CDNAME;
+//        var bears = regionsData[name].bears;
+//        return getColorLinear(bears, 'Bears')
+//      })
+//      .style("opacity", 1);
 
-    densityLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var density = regionsData[name].density;
-        return getColorLog(density, 'Density')
-      })
-      .style("opacity", 1);
+    //redrawing entire map with new color
+    redraw = function(prop) {
+      if (prop === "white") {
+        mapJ.selectAll("path").style("fill", "white");
+      } else {
+        var property = prop.toLowerCase(); //had to do this because we have different naming method from json and regionData
+        mapJ.selectAll("path").style("fill", function (d) {
+          var name = d.properties.CDNAME;
+          var attr = regionsData[name][property];
+          return getColor(attr, prop)
+        });
+      }
+    };
 
-    hospitalsLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var hospitals = regionsData[name].hospitals;
-        return getColorLinear(hospitals, 'Hospitals')
-      })
-      .style("opacity", 1);
-
-    wildlifeLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var wildlife = regionsData[name].wildlife;
-        return getColorLinear(wildlife, 'Wildlife')
-      })
-      .style("opacity", 1);
-
-    bearsLayer.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("id", getGeoName)
-      .style("fill", function(d){
-        var name = d.properties.CDNAME;
-        var bears = regionsData[name].bears;
-        return getColorLinear(bears, 'Bears')
-      })
-      .style("opacity", 1);
 
     // Color functions
+
+    //writing this function so we can reuse previous getColor functions
+    function getColor(val,prop){
+      if (prop === "Population" || prop === "Density"){
+        return getColorLog(val,prop)
+      } else {
+        return getColorLinear(val,prop)
+      }
+    }
+
     function getColorLinear(val, prop) {
       var color = d3.scale.linear()
         .domain([
@@ -192,8 +247,7 @@ d3.csv("RegionsBC.csv", function (data) {
           })
         ])
         .range([
-          "white", "green"]);
-
+          propColor[prop].min, propColor[prop].max]);
       return color(val);
     }
 
@@ -208,7 +262,7 @@ d3.csv("RegionsBC.csv", function (data) {
           })
         ])
         .range([
-          "white", "red"]);
+          propColor[prop].min, propColor[prop].max]);
       return color(val);
     }
 
@@ -347,6 +401,7 @@ $(function () {
 
   $('svg').on('click','path', function() {
     $('#info-box').slideDown("swing", 4000);
+
     var selectRegion = this;
     function toggleRegion(){
 
@@ -361,6 +416,8 @@ $(function () {
               .style('fill', 'white')
               .attr('transform', 'translate(0)');
           });
+
+    $(".tgl.tgl-flat").prop("checked", false);
 
         var $path = d3.select(selectRegion).moveToFront();
         $path
@@ -405,7 +462,7 @@ $(function () {
       radius = Math.min(width, height) / 2;
 
     var color = d3.scale.category10();
-    var domain = ["Caribou", "Bears", "Deer", "Goats"]
+    var domain = ["Caribou", "Bears", "Deer", "Goats"];
     color.domain(domain)
       .range(["#add4a3", "#65b6aa", "#5b7d8d", "#4f2958"]);
 
@@ -503,3 +560,4 @@ $(function () {
     }
   });
 });
+
