@@ -1,13 +1,14 @@
 @import "popup"
 @import "_map"
+@include font-face(deadfont, deadfont/TheDeadAreComing)
 
 $font-stack: 'Ubuntu', sans-serif
 
 body
-  font: 100% font-stack
+  font: 100% anton
   color: white
   background: black
-  font-size: 18px
+  font-size: 36px
 
 .container
   +clearfix
@@ -47,8 +48,18 @@ body
 #info-box
   @include span-columns(3)
   float: right
+  font-size: 0.7em
+
+#selectSection
+  text-align: center
+  position: relative
+  top: 50px
+
+#select-btn
+  width: 200px
 
 #infoList
+  font-size: 0.7em
   float: left
 
 #filter
@@ -77,10 +88,10 @@ body
 #city-select
   visibility: hidden
 
-h3
+h1
   color: #e74c3c
   text-shadow: 0 1px 1px rgba(0,0,0,.5)
-  font-size: 25px
+  font-size: 1.2em
 
 #legend
   margin-top: 7px
@@ -119,3 +130,15 @@ h3
   margin: 2px
   margin-left: 8px
   vertical-align: middle
+
+#title
+  font: 100% deadfont
+  font-size: 1.6em
+  display: inline-block
+  position: relative
+  left: 50px
+  line-height: 20px
+  color: white
+
+#board
+  font-size: 0.5em

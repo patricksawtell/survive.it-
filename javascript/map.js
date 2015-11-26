@@ -1,10 +1,12 @@
-var width = 850;
+var width = 800;
 var height = 700;
 var regionsData = {};
 var svg = d3.select("#map")
   .append("svg")
   .attr("width", width)
   .attr("height", height);
+  //Hide Slider on load
+  $('#slider').hide();
 
 
 var mapJ = svg.append("g").attr("id", "main");
@@ -44,6 +46,7 @@ var propColor = {
   }
 };
 var currentRegion;
+var canSelectRegion = true;
 
 
 
@@ -396,6 +399,7 @@ $(function () {
 
   $('svg').on('click','path', function() {
     $('#info-box').slideDown("swing", 4000);
+    $(".tgl.tgl-flat").prop("checked", false);
 
     currentRegion = $(this).attr('id');
     d3.selectAll("#main > path")
@@ -508,14 +512,16 @@ $(function () {
       return a > 90 ? a - 180 : a;
     }
 
-    $('#info-box').append("<p>Is this where you'd like to hide out?" +
+    if(canSelectRegion){
+    $('#info-box').append("<div id='selectSection'>Hide out here?" +
+        "<br>" +
       "<button class='btn' id='select-btn'>Yes</button>" +
-    "</p>");
+    "</div>");}
 
 //Generate infobox
     function infoBox(d, population, density, hospitals){
       $('#info-box').html( function(){
-          return "<h3>"+d+"</h3>"+
+          return "<h1>"+d+"</h1>"+
           "<ul id='infoList'>"+
             "<li><strong>Population: </strong>" +population+ "</li>"+
             "<li><strong>Population Density:</strong> " +density+" per km<sup>2</li>"+
@@ -527,5 +533,5 @@ $(function () {
     }
 
   });
+});
 
-  });
