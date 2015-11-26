@@ -401,27 +401,53 @@ $(function () {
 
   $('svg').on('click','path', function() {
     $('#info-box').slideDown("swing", 4000);
+
+    var selectRegion = this;
+    function toggleRegion(){
+
+      if (canSelectRegion){
+        d3.selectAll("#main > path")
+          .each(function()
+          {
+            d3.select(this)
+              .transition()
+              .duration(150)
+              .style('stroke-width', 1)
+              .style('fill', 'white')
+              .attr('transform', 'translate(0)');
+          });
+
     $(".tgl.tgl-flat").prop("checked", false);
 
-    currentRegion = $(this).attr('id');
-    d3.selectAll("#main > path")
-    .each(function()
-    {
-      d3.select(this)
-      .transition()
-      .duration(150)
-      .style('stroke-width', 1)
-      .style('fill', 'white')
-      .attr('transform', 'translate(0)');
-    });
+        var $path = d3.select(selectRegion).moveToFront();
+        $path
+          .transition()
+          .duration(250)
+          .style('stroke-width', 5)
+          .style('fill', "orange")
+          .attr('transform', 'translate(10 -10)');
+      }else{
+        d3.selectAll("#main > path")
+          .each(function()
+          {
+            d3.select(this)
+              .transition()
+              .duration(150)
+              .style('stroke-width', 1)
+              .attr('transform', 'translate(0)');
+          });
 
-    var $path = d3.select(this).moveToFront();
-    $path
-      .transition()
-      .duration(250)
-      .style('stroke-width', 5)
-      .style('fill', "orange")
-      .attr('transform', 'translate(10 -10)');
+        var $path = d3.select(selectRegion).moveToFront();
+        $path
+          .transition()
+          .duration(250)
+          .style('stroke-width', 5)
+          .attr('transform', 'translate(10 -10)');
+      }
+    }
+
+    currentRegion = $(this).attr('id');
+    toggleRegion();
 
 
     var selectedRegion = regionsData[currentRegion];
