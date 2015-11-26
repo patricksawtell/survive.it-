@@ -29,7 +29,6 @@ $(document).ready(function() {
     $("#side-nav").css("visibility", "hidden");
     $(".header").slideUp("slow");
     $("#background").attr("style","display: inherit");
-
-  }); 
+  });
 
 });

@@ -24,6 +24,7 @@ var infectionHistory = [];
 
 
 
+
 d3.csv("RegionsBC.csv", function (data) {
   d3.json("bc29.topo.json", function (map) {
 
@@ -95,13 +96,6 @@ d3.csv("RegionsBC.csv", function (data) {
     toolTip();
 
 // Draws the map regions
-    // mapB.selectAll("path")
-    //   .data(featureCollection.features)
-    //   .enter()
-    //   .append("path")
-    //   .attr("d", path)
-    //   .attr("class", "background");
-
     mapJ.selectAll("path")
       .data(featureCollection.features)
       .enter()
@@ -462,7 +456,7 @@ $(function () {
       return a > 90 ? a - 180 : a;
     }
 
-    $('#info-box').append("<p>Is this where you'd like to hide out?" +
+    $('#info-box').append("<p id='select'>Would you like to hide here?" +
       "<button class='btn' id='select-btn'>Yes</button>" +
     "</p>");
 
@@ -486,6 +480,7 @@ $(function () {
 
   //Start Game
   $("#info-box").on("click","#select-btn", function(){
+    $('#select').remove();
     var day = 0;
     var startRegion = currentRegion;
     regionsData[startRegion].infectStatus = true;
@@ -558,7 +553,6 @@ $(function () {
       //1. Start a new day
       ++day;
       infectionHistory[day] = {};
-      console.log("day ", day);
       //2. Run propagation to the regions with true infectStatus
       Object.keys(regionsData).filter(function (region) {
         return this[region].infectStatus;
@@ -573,7 +567,6 @@ $(function () {
         };
       }, regionsData);
 
-      console.log("Day", day, " - infectHistory: ", infectionHistory);
       //4. Animation
       animate(infectionHistory[day]);
 
@@ -589,9 +582,6 @@ $(function () {
     }
     //Run the game!!
     infect();
-
-
-
   })
 
 });
