@@ -1,4 +1,4 @@
-var width = 850;
+var width = 800;
 var height = 700;
 var regionsData = {};
 var svg = d3.select("#map")
@@ -21,6 +21,7 @@ var neighborNames;
 var neighborDirection;
 var infectionHistory = [];
 var currentRegion;
+var canSelectRegion = true;
 
 
 
@@ -454,14 +455,16 @@ $(function () {
       return a > 90 ? a - 180 : a;
     }
 
-    $('#info-box').append("<p>Is this where you'd like to hide out?" +
+    if(canSelectRegion){
+    $('#info-box').append("<div id='selectSection'>Hide out here?" +
+        "<br>" +
       "<button class='btn' id='select-btn'>Yes</button>" +
-    "</p>");
+    "</div>");}
 
 //Generate infobox
     function infoBox(d, population, density, hospitals){
       $('#info-box').html( function(){
-          return "<h3>"+d+"</h3>"+
+          return "<h1>"+d+"</h1>"+
           "<ul id='infoList'>"+
             "<li><strong>Population: </strong>" +population+ "</li>"+
             "<li><strong>Population Density:</strong> " +density+" per km<sup>2</li>"+

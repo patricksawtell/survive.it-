@@ -5,8 +5,11 @@ $(function() {
 
   //Start Game
   $("#info-box").on("click","#select-btn", function(){
+
+    canSelectRegion = false;
+    $("#selectSection").remove();
+
     $("#side-nav").slideUp("fast");
-    $('g').not("#main").attr("style", "display: none");
     var board = $("<div>").css({
       "border": "solid 2px white",
       "border-radius": "10px",
@@ -186,6 +189,7 @@ $(function() {
       if ( !survivorsLeft() || day === 28) {
         console.log('Finish');
         selectEnding(userAlive,deathDate);
+        canSelectRegion = true;
         return;
       }
 
