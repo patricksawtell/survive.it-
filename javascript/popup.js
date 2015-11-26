@@ -12,7 +12,7 @@ $(document).ready(function() {
 
   //transition effect
   $('#mask').fadeIn(500);
-  $('#mask').fadeTo("slow",0.9);
+  $('#mask').fadeTo("slow",1);
 
   //Get the window height and width
   var winH = $(window).height();

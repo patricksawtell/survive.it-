@@ -16,3 +16,40 @@
         rotate(360deg);
     }
 }
+
+@keyframes flash-background {
+    0% {
+        background-image: url("background.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    10% {
+        background-color: black;
+    }
+    20% {
+        background-image: url("background.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    30% {
+        background-color: black;
+    }
+    50% {
+        background-image: url("background.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    80% {
+        background-color: black;
+    }
+
+    90% {
+        background-image: url("background.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    100% {
+        background-color: black;
+    }
+}
