@@ -212,6 +212,10 @@ $(function() {
         userAlive = checkSurvival(regionsData[currentRegion], day)
       }
 
+
+      //6. Display game message
+      displayMessage(day);
+
       //5. if every regions is been infected, to 100 then game stop
       if (!survivorsLeft() || day === 28) {
         console.log('Finish');
@@ -225,13 +229,11 @@ $(function() {
       }
 
 
-      //6. Display game message
-      displayMessage(day);
 
       //7. Run next day
       setTimeout(function () {
         infect();
-      }, 1000);
+      }, 500);
     }
 
     //Slider change animation of day

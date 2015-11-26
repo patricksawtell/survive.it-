@@ -356,8 +356,13 @@ h1 {
 #slider {
   position: relative;
   display: inline-block;
-  left: 250px;
   bottom: 2px; }
+
+#slider-box {
+  position: absolute;
+  left: 1100px;
+  top: 50px;
+  display: inline-block; }
 
 #days {
   font: 100% deadfont;
