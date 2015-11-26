@@ -86,7 +86,7 @@ d3.csv("RegionsBC.csv", function (data) {
     }
 
     function survivalRate(population, density, hospital, bears, goats, caribou, deer){
-      return population*(-0.000001)+density*(-0.001)+hospital*(3)+bears*(-0.001)+goats*(0.001)+caribou*(0.002)+deer*(0.002)
+      return (population*(-0.000001)+density*(-0.001)+hospital*(3)+bears*(-0.001)+goats*(0.0015)+caribou*(0.0025)+deer*(0.0025)).toFixed(2)
     }
     //TODO fix number, add police station or rescue station? supermarkets?
 
@@ -101,10 +101,10 @@ d3.csv("RegionsBC.csv", function (data) {
 
     function mouseOver(d){
       var regionName = d.properties.CDNAME;
-      var population = regionsData[regionName]['population'];
+      var survivalrate = regionsData[regionName]['survivalrate'];
       displayName = regionName.split("_").join(" ");
       d3.select("#tooltip").transition().duration(200).style("opacity", .9);
-      d3.select("#tooltip").html(toolTip(displayName, population))
+      d3.select("#tooltip").html(toolTip(displayName, survivalrate))
         .style("left", (d3.event.pageX) + "px")
         .style("top", (d3.event.pageY - 28) + "px");
     }
@@ -113,9 +113,9 @@ d3.csv("RegionsBC.csv", function (data) {
       d3.select("#tooltip").transition().duration(500).style("opacity", 0);
     }
 
-    var toolTip =   function tooltipHtml(d, population){
+    var toolTip =   function tooltipHtml(d, survivalrate){
       return "<h4>"+d+"</h4><table>"+
-        "<tr><td>Population</td><td>"+population+"</td></tr>"+
+        "<tr><td>Survival Rate</td><td>"+survivalrate+"</td></tr>"+
         "</table>";
     };
     toolTip();
