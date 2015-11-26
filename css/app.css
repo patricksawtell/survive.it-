@@ -179,11 +179,16 @@ polyline {
 .background {
   fill: white; }
 
+@font-face {
+  font-family: deadfont;
+  font-style: normal;
+  font-weight: normal;
+  src: url("deadfont/TheDeadAreComing.eot?#iefix") format("embedded-opentype"), url("deadfont/TheDeadAreComing.woff2") format("woff2"), url("deadfont/TheDeadAreComing.woff") format("woff"), url("deadfont/TheDeadAreComing.ttf") format("truetype"), url("deadfont/TheDeadAreComing.svg#deadfont") format("svg"); }
 body {
-  font: 100% font-stack;
+  font: 100% anton;
   color: white;
   background: black;
-  font-size: 18px; }
+  font-size: 36px; }
 
 .container {
   max-width: 100%;
@@ -250,11 +255,21 @@ body {
   display: block;
   margin-right: 2.35765%;
   width: 23.23176%;
-  float: right; }
+  float: right;
+  font-size: 0.7em; }
   #info-box:last-child {
     margin-right: 0; }
 
+#selectSection {
+  text-align: center;
+  position: relative;
+  top: 50px; }
+
+#select-btn {
+  width: 200px; }
+
 #infoList {
+  font-size: 0.7em;
   float: left; }
 
 #filter {
@@ -283,10 +298,10 @@ body {
 #city-select {
   visibility: hidden; }
 
-h3 {
+h1 {
   color: #e74c3c;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
-  font-size: 25px; }
+  font-size: 1.2em; }
 
 #legend {
   margin-top: 7px;
@@ -325,5 +340,17 @@ h3 {
   margin: 2px;
   margin-left: 8px;
   vertical-align: middle; }
+
+#title {
+  font: 100% deadfont;
+  font-size: 1.6em;
+  display: inline-block;
+  position: relative;
+  left: 50px;
+  line-height: 20px;
+  color: white; }
+
+#board {
+  font-size: 0.5em; }
 
 /*# sourceMappingURL=app.css.map */
