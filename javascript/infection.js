@@ -74,14 +74,15 @@ $(function() {
     function checkSurvival(region, day){
 
       var infectLevel = region.infectDegree; //always increasing
-      var survivalRate = region.survivalrate; //always decreasing
+      var survivalRate = parseFloat(region.survivalrate); //always decreasing
       var maxSurvive = 100;
-      var minSurvive = infectLevel + day*1.5; //gets harder to survive as time passes
+      var minSurvive = infectLevel;// + day*1.5; //gets harder to survive as time passes
 
       if (randomSurvival(survivalRate,maxSurvive) > minSurvive ){ //rolls to check to see if user is alive
         return true;
       } else {
         deathDate = day;
+        debugger
         return false;
       }
     }
