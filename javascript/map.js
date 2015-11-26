@@ -5,6 +5,8 @@ var svg = d3.select("#map")
   .append("svg")
   .attr("width", width)
   .attr("height", height);
+  //Hide Slider on load
+  $('#slider').hide();
 
 
 var mapB = svg.append("g").attr("id", "background");
@@ -459,7 +461,21 @@ $(function () {
     }
 
   });
+  
 
+  //Animate color
+  function animate(record){
+    Object.keys(regionsData).forEach(
+      function(region){
+        var infectedRegion = this[region];
+        if(infectedRegion.infectStatus){
+          $("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
+        } else {
+          $("#"+ region).css({"fill": "#FFFFFF", "fill-opacity": 100});
+        }
+      }
+      , record)
+  }
 
 
   //Start Game
@@ -503,17 +519,6 @@ $(function () {
       }
     }
 
-    //Animate color
-    function animate(record){
-      Object.keys(regionsData).forEach(
-        function(region){
-          var infectedRegion = this[region];
-          if(infectedRegion.infectStatus){
-            $("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
-          }
-        }
-        , record)
-    }
 
     //Take snapshot of 0 day
     infectionHistory[0] = {};
@@ -533,6 +538,18 @@ $(function () {
 
     //Game Logic
     function infect() {
+
+      //Slider DAY update 
+      var def = d3.select("svg")
+      .append("defs")
+      .attr("class","animate");
+      $('#slider').attr('max', day);
+
+      //Slider output current day position of slider
+    $('body').on('input', '#slider', function() {
+      console.log('current value: ', $(this).val());
+    });
+
       //1. Start a new day
       ++day;
       infectionHistory[day] = {};
@@ -558,6 +575,9 @@ $(function () {
       //5. if every regions is been infected, to 100 then game stop
       if ( !survivorsLeft() || day === 28) {
         console.log('Finish');
+      //Slider Show on Completion
+        $('#slider').show();
+        $('#slider').val(28);
         return;
       }
       //6. Run next day
@@ -565,11 +585,20 @@ $(function () {
         infect();
       }, 500);
     }
+
+    //Slider change animation of day
+    $('body').on('input', '#slider', function() {
+      animate(infectionHistory[$(this).val()]);
+      console.log(infectionHistory);
+    });
+
+    //Slider dynamic Day
+    $("input").on("input", function(){
+      $("h4").text("Infection Day" + " " + $(this).val());
+    });
+
     //Run the game!!
     infect();
-
-
-
   })
 
 });
