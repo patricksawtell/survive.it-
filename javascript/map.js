@@ -95,12 +95,12 @@ d3.csv("RegionsBC.csv", function (data) {
     toolTip();
 
 // Draws the map regions
-    mapB.selectAll("path")
-      .data(featureCollection.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .attr("class", "background");
+    // mapB.selectAll("path")
+    //   .data(featureCollection.features)
+    //   .enter()
+    //   .append("path")
+    //   .attr("d", path)
+    //   .attr("class", "background");
 
     mapJ.selectAll("path")
       .data(featureCollection.features)
@@ -111,7 +111,10 @@ d3.csv("RegionsBC.csv", function (data) {
         return item.properties.CDNAME;
       })
       .attr("class", "region")
-      .on("mouseover", mouseOver).on("mouseout", mouseOut);
+      .on("mouseover", mouseOver).on("mouseout", mouseOut)
+      .on('click', function(){
+        d3.select(this).transition().attr("width", 120);
+      });
 
 //Draw Cloud
 //    $('<div>').addClass('clouds').text('Hi').appendTo($('body'));
@@ -347,9 +350,28 @@ d3.csv("RegionsBC.csv", function (data) {
 //$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 $(function () {
   var currentRegion;
-  $('svg').on('click','path', function() {
-    $('#info-box').slideDown("swing", 4000);
+  $('svg').on('click','#main path', function(d) {
     currentRegion = $(this).attr('id');
+    d3.selectAll("#main > path")
+    .each(function()
+    {
+      d3.select(this)
+      .transition()
+      .duration(150)
+      .style('stroke-width', 1)
+      .style('fill', 'white')
+      .attr('transform', 'translate(0)');
+    });
+
+    var $path = d3.select(this).moveToFront();
+    $path
+      .transition()
+      .duration(250)
+      .style('stroke-width', 5)
+      .style('fill', "orange")
+      .attr('transform', 'translate(10 -10)');
+
+
     var selectedRegion = regionsData[currentRegion];
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
 
@@ -357,8 +379,8 @@ $(function () {
     $('#info-box').html(infoBox(currentRegion.split("_").join(" "), regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
 
 // Create graphs for each region
-    var width = 200,
-      height = 125,
+    var width = 225,
+      height = 175,
       radius = Math.min(width, height) / 2;
 
     var color = d3.scale.category10();
@@ -393,6 +415,8 @@ $(function () {
         return color(d.data);
       });
 
+
+
 // Generate labels for charts
 
     g.append("text")
@@ -411,13 +435,7 @@ $(function () {
         d.radius = radius + 50; // Set Outer Coordinate
         d.innerRadius = radius + 45; // Set Inner Coordinate
         return "translate(" + arc.centroid(d) + ")";
-      })
-      .attr("text-anchor", "middle") //center the text on it's origin
-      .style("fill", "Purple")
-      .style("font", "bold 12px Arial")
-      .text(function (d, i) {
-        return selectedRegion[i];
-      }); //get the label from our original data array
+      });
 
     // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
     g.filter(function (d) {
@@ -433,7 +451,7 @@ $(function () {
         return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
       })
       .style("fill", "White")
-      .style("font", "bold 10px Arial")
+      .style("font", "bold 18px Arial")
       .text(function (d) {
         return d.data;
       });
@@ -444,17 +462,21 @@ $(function () {
       return a > 90 ? a - 180 : a;
     }
 
+    $('#info-box').append("<p>Is this where you'd like to hide out?" +
+      "<button class='btn' id='select-btn'>Yes</button>" +
+    "</p>");
+
 //Generate infobox
     function infoBox(d, population, density, hospitals){
       $('#info-box').html( function(){
           return "<h3>"+d+"</h3>"+
-          "<ul>"+
-            "<li>Population: " +population+ "</li>"+
-            "<li>Population Density: " +density+"</li>"+
-            "<li>Hospitals: " +hospitals+"</li></ul>"+
-            "<p>Is this where you'd like to hide out?"+
-              "<button class='btn' id='select-btn'>Yes</button>"+
-            "</p>";
+          "<ul id='infoList'>"+
+            "<li><strong>Population: </strong>" +population+ "</li>"+
+            "<li><strong>Population Density:</strong> " +density+" per km<sup>2</li>"+
+            "<li><strong>Hospitals: </strong>" +hospitals+"</li></ul>"+
+            "<ul id='legend'>" +
+          "<li><span id='bears'></span> Bears <span id='caribou'></span> Caribou </li>" +
+             "<li><span id='deer'></span> Deer <span id='goats'></span> Mountain Goats</li>";
       });
     }
 
