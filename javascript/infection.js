@@ -29,7 +29,7 @@ $(function() {
     var array = $.map(regionsData, function (value, index) {
       return index
     });
-    var ind = Math.floor(Math.random() * (29) + 1);
+    var ind = Math.floor(Math.random() * (29));
     var startRegion = array[ind];
     regionsData[startRegion].infectStatus = true;
     regionsData[startRegion].direction = "center";
