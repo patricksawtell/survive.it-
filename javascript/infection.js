@@ -6,6 +6,7 @@ $(function() {
 
   //Slider hide on load
   $('#slider').hide();
+  $("h4").text("Infection Day" + " 0");
   var day = 0;
 
   //Start Game
@@ -169,8 +170,6 @@ $(function() {
 
     displayMessage(0);
 
-
-
     //Game Logic
     function infect() {
 
@@ -187,6 +186,7 @@ $(function() {
 
       //1. Start a new day
       ++day;
+      $("h4").text("Infection Day" + " " + day);
       $('#slider').attr('max', day);
       infectionHistory[day] = {};
       console.log("day ", day);
@@ -228,6 +228,7 @@ $(function() {
           "</div>");
 
         $('#restart-btn').on('click',function(){
+          $("h4").text("Infection Day" + " 0");
           canSelectRegion = true;
           $(".tgl.tgl-flat").prop("checked", false);
           $('#slider-box').hide();
