@@ -1,4 +1,4 @@
-var width = 700;
+var width = 850;
 var height = 700;
 var regionsData = {};
 var svg = d3.select("#map")
@@ -7,7 +7,6 @@ var svg = d3.select("#map")
   .attr("height", height);
 
 
-var mapB = svg.append("g").attr("id", "background");
 var mapJ = svg.append("g").attr("id", "main");
 
 var densityLayer = svg.append("g").attr("id", "density");
@@ -44,6 +43,7 @@ var propColor = {
     max: "#EEA74F"
   }
 };
+var currentRegion;
 
 
 
@@ -96,9 +96,9 @@ d3.csv("RegionsBC.csv", function (data) {
 //Tooltip Functionality
 
     function mouseOver(d){
-      var regionName = d.properties.CDNAME
-      var population = regionsData[regionName]['population']
-      displayName = regionName.split("_").join(" ")
+      var regionName = d.properties.CDNAME;
+      var population = regionsData[regionName]['population'];
+      displayName = regionName.split("_").join(" ");
       d3.select("#tooltip").transition().duration(200).style("opacity", .9);
       d3.select("#tooltip").html(toolTip(displayName, population))
         .style("left", (d3.event.pageX) + "px")
@@ -133,10 +133,11 @@ d3.csv("RegionsBC.csv", function (data) {
         return item.properties.CDNAME;
       })
       .attr("class", "region")
-      .on("mouseover", mouseOver).on("mouseout", mouseOut);
+      .on("mouseover", mouseOver).on("mouseout", mouseOut)
+      .on('click', function(){
+        d3.select(this).transition().attr("width", 120);
+      });
 
-//Draw Cloud
-//    $('<div>').addClass('clouds').text('Hi').appendTo($('body'));
 
 //Generate layers for filters
 //    populationLayer.selectAll("path")
@@ -291,10 +292,10 @@ d3.csv("RegionsBC.csv", function (data) {
       })[1];
       result.width = result.maxX - result.minX;
       result.height = result.maxY - result.minY;
-      var marginW = result.width * 0.1;
-      var marginH = result.height * 0.1;
+      var marginW = result.width * 0.05;
+      var marginH = result.height * 0.05;
 
-      var viewBox = (result.minX - marginW) + ' ' + (result.minY - marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
+      var viewBox = (result.minX) + ' ' + (result.minY + marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
       return viewBox;
     }
     //Set the view Box
@@ -392,10 +393,31 @@ d3.csv("RegionsBC.csv", function (data) {
 
 //$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 $(function () {
-  var currentRegion;
+
   $('svg').on('click','path', function() {
     $('#info-box').slideDown("swing", 4000);
+
     currentRegion = $(this).attr('id');
+    d3.selectAll("#main > path")
+    .each(function()
+    {
+      d3.select(this)
+      .transition()
+      .duration(150)
+      .style('stroke-width', 1)
+      .style('fill', 'white')
+      .attr('transform', 'translate(0)');
+    });
+
+    var $path = d3.select(this).moveToFront();
+    $path
+      .transition()
+      .duration(250)
+      .style('stroke-width', 5)
+      .style('fill', "orange")
+      .attr('transform', 'translate(10 -10)');
+
+
     var selectedRegion = regionsData[currentRegion];
     var graphData = [regionsData[currentRegion].caribou, regionsData[currentRegion].bears, regionsData[currentRegion].deer, regionsData[currentRegion].goats];
 
@@ -403,8 +425,8 @@ $(function () {
     $('#info-box').html(infoBox(currentRegion.split("_").join(" "), regionsData[currentRegion].population, regionsData[currentRegion].density, regionsData[currentRegion].hospitals));
 
 // Create graphs for each region
-    var width = 200,
-      height = 125,
+    var width = 225,
+      height = 175,
       radius = Math.min(width, height) / 2;
 
     var color = d3.scale.category10();
@@ -439,6 +461,8 @@ $(function () {
         return color(d.data);
       });
 
+
+
 // Generate labels for charts
 
     g.append("text")
@@ -457,13 +481,7 @@ $(function () {
         d.radius = radius + 50; // Set Outer Coordinate
         d.innerRadius = radius + 45; // Set Inner Coordinate
         return "translate(" + arc.centroid(d) + ")";
-      })
-      .attr("text-anchor", "middle") //center the text on it's origin
-      .style("fill", "Purple")
-      .style("font", "bold 12px Arial")
-      .text(function (d, i) {
-        return selectedRegion[i];
-      }); //get the label from our original data array
+      });
 
     // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
     g.filter(function (d) {
@@ -479,7 +497,7 @@ $(function () {
         return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
       })
       .style("fill", "White")
-      .style("font", "bold 10px Arial")
+      .style("font", "bold 18px Arial")
       .text(function (d) {
         return d.data;
       });
@@ -490,182 +508,24 @@ $(function () {
       return a > 90 ? a - 180 : a;
     }
 
+    $('#info-box').append("<p>Is this where you'd like to hide out?" +
+      "<button class='btn' id='select-btn'>Yes</button>" +
+    "</p>");
+
 //Generate infobox
     function infoBox(d, population, density, hospitals){
       $('#info-box').html( function(){
           return "<h3>"+d+"</h3>"+
-          "<ul>"+
-            "<li>Population: " +population+ "</li>"+
-            "<li>Population Density: " +density+"</li>"+
-            "<li>Hospitals: " +hospitals+"</li></ul>"+
-            "<p>Is this where you'd like to hide out?"+
-              "<button class='btn' id='select-btn'>Yes</button>"+
-            "</p>";
+          "<ul id='infoList'>"+
+            "<li><strong>Population: </strong>" +population+ "</li>"+
+            "<li><strong>Population Density:</strong> " +density+" per km<sup>2</li>"+
+            "<li><strong>Hospitals: </strong>" +hospitals+"</li></ul>"+
+            "<ul id='legend'>" +
+          "<li><span id='bears'></span> Bears <span id='caribou'></span> Caribou </li>" +
+             "<li><span id='deer'></span> Deer <span id='goats'></span> Mountain Goats</li>";
       });
     }
 
   });
 
-
-
-  //Start Game
-  $("#info-box").on("click","#select-btn", function(){
-    var day = 0;
-
-    //randomizer for starting location
-    var array = $.map(regionsData, function(value, index) {return index});
-    var ind = Math.floor(Math.random()*(29)+1);
-    var startRegion = array[ind];
-    regionsData[startRegion].infectStatus = true;
-    regionsData[startRegion].direction = "center";
-
-    //When outbreak spread, you need to find the neighbours without being infected yet
-    function getCurrentNeighbors(region) {
-      var neighbours = neighborNames[region];
-      return neighbours.filter(function(name) {
-        return !regionsData[name].infectStatus;
-      });
-    }
-    //Make sure the game could stop looping when there is no more survivor
-    function survivorsLeft(){
-      return Object.keys(regionsData).some(function (key) {
-        return this[key].infectDegree < 100;
-      }, regionsData);
-    }
-
-    // Add infectDegree to infectStatus true regions + Spread outbreak to neighbours
-    function propagate(infectedRegionKey) {
-      var infectedRegion = this[infectedRegionKey];
-
-      if (infectedRegion.infectDegree < maxDegree) {
-        infectedRegion.infectDegree += infectionIncrement(infectedRegion);
-        //debugger
-      }
-      if (infectedRegion.infectDegree > infectionThreshold) {
-        var neighbourList = getCurrentNeighbors(infectedRegionKey);
-        function notInfectedNeighbourFilter(neighbour) {
-          return !this[neighbour].infectStatus;
-        }
-        function infectNeighbour(neighbour) {
-          this[neighbour].infectStatus = true;
-          this[neighbour].direction = neighborDirection[infectedRegionKey][neighbour];
-        }
-        neighbourList.filter(notInfectedNeighbourFilter, this).forEach(infectNeighbour, this);
-      }
-    }
-
-    // User survival related logic
-    var userAlive = true;
-    var deathDate;
-
-    function checkSurvival(region, day){
-
-      var infectLevel = region.infectDegree; //always increasing
-      var survivalRate = region.survivalrate; //always decreasing
-      var maxSurvive = 100;
-      var minSurvive = infectLevel + day*1; //gets harder to survive as time passes
-
-      if (randomSurvival(survivalRate,maxSurvive) > minSurvive ){ //rolls to check to see if user is alive
-        return true;
-      } else {
-        debugger
-        deathDate = day;
-        return false;
-      }
-    }
-
-    function randomSurvival(min,max) {
-      return Math.floor(Math.random()*(max-min+1)+min);
-    }
-
-    //provide ending
-
-    function selectEnding(userAlive, deathDate){
-      if (userAlive){
-        console.log("simulation ends, user is alive!")
-      } else {
-        console.log("simulation ends, unfortunately user was dead on day " + deathDate)
-      }
-    }
-
-    //Animate color
-    function animate(record){
-      Object.keys(regionsData).forEach(
-        function(region){
-          var infectedRegion = this[region];
-          if(infectedRegion.infectStatus){
-            $("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
-          }
-        }
-        , record)
-    }
-
-    //Take snapshot of 0 day
-    infectionHistory[0] = {};
-    Object.keys(regionsData).forEach(function(region){
-      infectionHistory[0][region] = {};
-      infectionHistory[0][region]["infecStatus"] = regionsData[region]["infectStatus"];
-      infectionHistory[0][region]["infectDegree"] = regionsData[region]["infectDegree"];
-      infectionHistory[0][region]["direction"] = regionsData[region]["direction"];
-    });
-
-    //infection increment function
-    function infectionIncrement(region){
-      return Math.log(region.population)+Math.log(region.density)+region.infectDegree*0.02;//-region.hospitals
-    }
-
-    //initialize the game properties
-    //var infectionIncrement = 10;
-    //var infectionThreshold = infectionIncrement * 4;
-    var infectionThreshold = 40;
-    var maxDegree = 100;
-
-
-    //Game Logic
-    function infect() {
-      //1. Start a new day
-      ++day;
-      infectionHistory[day] = {};
-      console.log("day ", day);
-      //2. Run propagation to the regions with true infectStatus
-      Object.keys(regionsData).filter(function (region) {
-        return this[region].infectStatus;
-      }, regionsData).forEach(propagate, regionsData);
-      //3. Save snapshot of today's records of all the history
-      //debugger
-      Object.keys(regionsData).forEach(function (regionKey) {
-        var region = this[regionKey];
-        infectionHistory[day][regionKey] = {
-          infectStatus: region.infectStatus,
-          infectDegree: region.infectDegree,
-          direction: region.direction
-        };
-      }, regionsData);
-
-      console.log("Day", day, " - infectHistory: ", infectionHistory);
-      //4. Animation
-      animate(infectionHistory[day]);
-//debugger
-      //4.5 check user survival
-      if (userAlive === true){
-        userAlive = checkSurvival(regionsData[currentRegion], day)
-      }
-
-      //5. if every regions is been infected, to 100 then game stop
-      if ( !survivorsLeft() || day === 28) {
-        console.log('Finish');
-        selectEnding(userAlive,deathDate);
-        return;
-      }
-      //6. Run next day
-      setTimeout(function() {
-        infect();
-      }, 500);
-    }
-    //Run the game!!
-    infect();
-
-
-
-  })
-});
+  });
