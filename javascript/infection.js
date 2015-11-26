@@ -126,7 +126,7 @@ $(function() {
         return this[region].infectStatus;
       }, infectionHistory[day]);
 
-      $("#board").append("<p>Day: " + day + "</p>");
+      $("#board").append("<p><strong>Day: " + day + "</strong></p>");
 
       if(day > 0) {
         function isNewInfected(region) {
@@ -134,9 +134,9 @@ $(function() {
         }
         infectedRegions.forEach(function (region) {
           if (isNewInfected(region)){
-            var regionName = region;
+            var regionName = region.split("_").join(" ");
           var degree = Math.round(infectionHistory[day][region].infectDegree);
-          $("#board").append("<p>" + regionName + " is infected!</p>");
+          $("#board").append("<p> <font color='#7CCC63'>" + regionName + " is infected!</p>");
           }});
       }
       $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 1000);
@@ -163,11 +163,11 @@ $(function() {
     //Game Logic
     function infect() {
 
-      //Slider DAY update 
+      //Slider DAY update
       var def = d3.select("svg")
       .append("defs")
       .attr("class","animate");
-     
+
 
       //Slider output current day position of slider
       $('body').on('input', '#slider', function() {
@@ -214,7 +214,7 @@ $(function() {
         $('#slider').val(28);
         return;
       }
-      
+
 
       //6. Display game message
           displayMessage(day);
@@ -240,4 +240,3 @@ $(function() {
     infect();
   });
 });
-
