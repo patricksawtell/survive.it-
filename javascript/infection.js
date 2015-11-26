@@ -12,7 +12,7 @@ $(function() {
   $("#info-box").on("click","#select-btn", function() {
 
     canSelectRegion = false;
-    $("#selectSection").remove();
+    $("#selectSection").hide();
 
     $("#side-nav").slideUp("fast");
     var board = $("<div>").css({
@@ -149,7 +149,7 @@ $(function() {
           $("#board").append("<p> <font color='#7CCC63'>" + regionName + " is infected!</p>");
           }});
       }
-      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 1000);
+      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 500);
     }
 
     //Take snapshot of 0 day
@@ -220,6 +220,11 @@ $(function() {
       if (!survivorsLeft() || day === 28) {
         console.log('Finish');
         selectEnding(userAlive, deathDate);
+
+        $("#info-box").append("<div id='restartButton'>Restart?" +
+          "<br>" +
+          "<button class='btn' id='restart-btn'>Restart</button>" +
+          "</div>");
         canSelectRegion = true;
 
         //Slider Show on Completion
