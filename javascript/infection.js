@@ -3,7 +3,6 @@
  */
 $(function() {
 
-
   //Slider hide on load
   $('#slider').hide();
   $("h4").text("Infection Day" + " 0");
@@ -25,7 +24,6 @@ $(function() {
       "overflow-y": "scroll"
     }).attr("id", "board")
     $("#side").append(board);
-
 
     //randomizer for starting location
     var array = $.map(regionsData, function (value, index) {
@@ -57,8 +55,6 @@ $(function() {
 
       if (infectedRegion.infectDegree < maxDegree) {
         infectedRegion.infectDegree += infectionIncrement(infectedRegion);
-        console.log(infectionIncrement(infectedRegion));
-        //debugger
       }
       if (infectedRegion.infectDegree > infectionThreshold) {
         var neighbourList = getCurrentNeighbors(infectedRegionKey);
@@ -91,7 +87,6 @@ $(function() {
         return true;
       } else {
         deathDate = day;
-        //debugger
         return false;
       }
     }
@@ -103,7 +98,7 @@ $(function() {
     //provide ending
     function selectEnding(userAlive, deathDate){
       if (userAlive){
-        $("#board").append("<p>The infection was contained. You survived!! </p>");
+        $("#board").append("<p><font color = '#df173f'>The infection was contained. You survived!! </p>");
       } else {
         $("#board").append("<p><strong><font color = '#df173f'>BC has been overun! You only made it to day " + deathDate + "</strong></p>");
       }
@@ -181,7 +176,6 @@ $(function() {
 
       //Slider output current day position of slider
       $('body').on('input', '#slider', function () {
-        console.log('current value: ', $(this).val());
       });
 
       //1. Start a new day
@@ -189,13 +183,11 @@ $(function() {
       $("h4").text("Infection Day" + " " + day);
       $('#slider').attr('max', day);
       infectionHistory[day] = {};
-      console.log("day ", day);
       //2. Run propagation to the regions with true infectStatus
       Object.keys(regionsData).filter(function (region) {
         return this[region].infectStatus;
       }, regionsData).forEach(propagate, regionsData);
       //3. Save snapshot of today's records of all the history
-      //debugger
       Object.keys(regionsData).forEach(function (regionKey) {
         var region = this[regionKey];
         infectionHistory[day][regionKey] = {
@@ -205,7 +197,6 @@ $(function() {
         };
       }, regionsData);
 
-      console.log("Day", day, " - infectHistory: ", infectionHistory);
       //4. Animation
       animate(infectionHistory[day]);
 
@@ -220,7 +211,6 @@ $(function() {
 
       //5. if every regions is been infected, to 100 then game stop
       if (!survivorsLeft() || day === 28) {
-        console.log('Finish');
         selectEnding(userAlive, deathDate);
         $("#side").append("<div id='restartButton'>Restart?" +
           "<br>" +
@@ -264,7 +254,6 @@ $(function() {
     //Slider change animation of day
     $('body').on('input', '#slider', function () {
       animate(infectionHistory[$(this).val()]);
-      console.log(infectionHistory);
     });
 
     //Slider dynamic Day

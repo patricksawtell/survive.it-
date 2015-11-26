@@ -396,7 +396,7 @@ d3.csv("RegionsBC.csv", function (data) {
 });
 
 
-//$(window).click((e) => console.log(e.target))  this is to check what is been clicked
+
 $(function () {
 
   $('svg').on('click','path', function() {
