@@ -1,7 +1,6 @@
 $(document).ready(function() {
   showDialogue();
 
-
   var id = '#dialog';
 
   //Get the screen height and width
@@ -36,24 +35,28 @@ $(document).ready(function() {
   });
 
   //if mask is clicked
-  $('#mask').click(function () {
-    $(this).hide();
+  $('#pop').click(function () {
+    $('#mask').hide();
     $('.window').hide();
   });
 
   function showDialogue(){
+    $('#popupfoot').hide()
     $('.typist').typist({ speed: 12 })
-    .typistPause(2000) // 3 sec
-    .typistAdd('Hello? Are you there?\n', function() {
-
-    })
-    // .typistPause(2000) // 2 sec
-    // .typistAdd('Something is very wrong!!!!\n')
-    // .typistPause(2000) // 2 sec
-    // .typistAdd('You gotta get out of there. They\'re coming!\n')
-    // .typistPause(1000)
-    // .typistAdd('Hurry!')
-    .typistStop();
+    .typistPause(2000) // 2 sec
+    .typistAdd('Hello?\n')
+    .typistPause(2000) // 2 sec
+    .typistAdd('Are you there?\n')
+    .typistPause(2000) // 2 sec
+    .typistAdd('Something is wrong!!!!\n')
+    .typistPause(2000) // 2 sec
+    .typistAdd('The dead...are alive again!\n')
+    .typistPause(2000) // 2 sec
+    .typistAdd('They\'re after us!\n',
+    function() {
+    $('#popupfoot').fadeIn("slow");
+  })
+    .typistStop()
   }
 
 });

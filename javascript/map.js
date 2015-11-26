@@ -50,6 +50,7 @@ var canSelectRegion = true;
 
 
 
+
 d3.csv("RegionsBC.csv", function (data) {
   d3.json("bc29.topo.json", function (map) {
     //Initialize the region data in hash
@@ -120,6 +121,7 @@ d3.csv("RegionsBC.csv", function (data) {
     toolTip();
 
 // Draws the map regions
+
 //    mapB.selectAll("path")
 //      .data(featureCollection.features)
 //      .enter()
@@ -464,7 +466,6 @@ $(function () {
       .style("fill", function (d) {
         return color(d.data);
       });
-
 
 
 // Generate labels for charts

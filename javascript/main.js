@@ -30,4 +30,15 @@ $(document).ready(function() {
     //  $(self).siblings().not("#main").attr("style","display: none");
     //});
   });
+<<<<<<< HEAD
+
+// Toggle filter and header
+  $('p #select-btn').on('click', function(){
+    $("#side-nav").css("visibility", "hidden");
+    $(".header").slideUp("slow");
+    $("#background").attr("style","display: inherit");
+  });
+
+=======
+>>>>>>> 4ec3de8cb7b6a265761c41dfa57a1686fb936e36
 });
