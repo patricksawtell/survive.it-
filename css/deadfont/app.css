@@ -268,14 +268,6 @@ body {
 #select-btn {
   width: 200px; }
 
-#restartButton {
-  text-align: center;
-  position: relative;
-  top: 50px; }
-
-#restart-btn {
-  width: 200px; }
-
 #infoList {
   font-size: 0.7em;
   float: left; }
