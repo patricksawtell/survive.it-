@@ -23,4 +23,13 @@ $(document).ready(function() {
       $(self).siblings().not("#main").attr("style","display: none");
     });
   });
+
+// Toggle filter and header
+  $('p #select-btn').on('click', function(){
+    $("#side-nav").css("visibility", "hidden");
+    $(".header").slideUp("slow");
+    $("#background").attr("style","display: inherit");
+  });
+
+
 });

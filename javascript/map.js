@@ -27,6 +27,7 @@ var canSelectRegion = true;
 
 
 
+
 d3.csv("RegionsBC.csv", function (data) {
   d3.json("bc29.topo.json", function (map) {
 
@@ -97,6 +98,7 @@ d3.csv("RegionsBC.csv", function (data) {
     };
     toolTip();
 
+// Draws the map regions
     mapJ.selectAll("path")
       .data(featureCollection.features)
       .enter()
@@ -435,7 +437,6 @@ $(function () {
       });
 
 
-
 // Generate labels for charts
 
     g.append("text")
@@ -500,6 +501,5 @@ $(function () {
              "<li><span id='deer'></span> Deer <span id='goats'></span> Mountain Goats</li>";
       });
     }
-
   });
 });
