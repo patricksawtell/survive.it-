@@ -185,7 +185,7 @@ polyline {
   font-weight: normal;
   src: url("deadfont/TheDeadAreComing.eot?#iefix") format("embedded-opentype"), url("deadfont/TheDeadAreComing.woff2") format("woff2"), url("deadfont/TheDeadAreComing.woff") format("woff"), url("deadfont/TheDeadAreComing.ttf") format("truetype"), url("deadfont/TheDeadAreComing.svg#deadfont") format("svg"); }
 body {
-  font: 100% anton;
+  font: 100% "Ubuntu", sans-serif;
   color: white;
   background: black;
   font-size: 36px; }
@@ -356,8 +356,13 @@ h1 {
 #slider {
   position: relative;
   display: inline-block;
-  left: 250px;
   bottom: 2px; }
+
+#slider-box {
+  position: absolute;
+  left: 1100px;
+  top: 50px;
+  display: inline-block; }
 
 #days {
   font: 100% deadfont;
