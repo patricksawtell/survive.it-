@@ -1,13 +1,14 @@
-var width = 700;
+var width = 800;
 var height = 700;
 var regionsData = {};
 var svg = d3.select("#map")
   .append("svg")
   .attr("width", width)
   .attr("height", height);
+  //Hide Slider on load
+  $('#slider').hide();
 
 
-var mapB = svg.append("g").attr("id", "background");
 var mapJ = svg.append("g").attr("id", "main");
 
 var densityLayer = svg.append("g").attr("id", "density");
@@ -21,6 +22,8 @@ var deerLayer = svg.append("g").attr("id", "deer");
 var neighborNames;
 var neighborDirection;
 var infectionHistory = [];
+var currentRegion;
+var canSelectRegion = true;
 
 
 
@@ -61,9 +64,9 @@ d3.csv("RegionsBC.csv", function (data) {
     };
 
     function survivalRate(population, density, hospital, bears, goats, caribou, deer){
-      return population*(-0.000001)+density*(-0.001)+hospital*(2)+bears*(-0.01)+goats*(0.01)+caribou*(0.01)+deer*(0.02)
+      return population*(-0.000001)+density*(-0.001)+hospital*(3)+bears*(-0.001)+goats*(0.001)+caribou*(0.002)+deer*(0.002)
     }
-
+    //TODO fix number, add police station or rescue station? supermarkets?
 
 
 //Set Projection and get the neighbours list(but only with number)
@@ -75,9 +78,9 @@ d3.csv("RegionsBC.csv", function (data) {
 //Tooltip Functionality
 
     function mouseOver(d){
-      var regionName = d.properties.CDNAME
-      var population = regionsData[regionName]['population']
-      displayName = regionName.split("_").join(" ")
+      var regionName = d.properties.CDNAME;
+      var population = regionsData[regionName]['population'];
+      displayName = regionName.split("_").join(" ");
       d3.select("#tooltip").transition().duration(200).style("opacity", .9);
       d3.select("#tooltip").html(toolTip(displayName, population))
         .style("left", (d3.event.pageX) + "px")
@@ -92,7 +95,7 @@ d3.csv("RegionsBC.csv", function (data) {
       return "<h4>"+d+"</h4><table>"+
         "<tr><td>Population</td><td>"+population+"</td></tr>"+
         "</table>";
-    }
+    };
     toolTip();
 
 // Draws the map regions
@@ -110,8 +113,6 @@ d3.csv("RegionsBC.csv", function (data) {
         d3.select(this).transition().attr("width", 120);
       });
 
-//Draw Cloud
-//    $('<div>').addClass('clouds').text('Hi').appendTo($('body'));
 
 //Generate layers for filters
     populationLayer.selectAll("path")
@@ -242,10 +243,10 @@ d3.csv("RegionsBC.csv", function (data) {
       })[1];
       result.width = result.maxX - result.minX;
       result.height = result.maxY - result.minY;
-      var marginW = result.width * 0.1;
-      var marginH = result.height * 0.1;
+      var marginW = result.width * 0.05;
+      var marginH = result.height * 0.05;
 
-      var viewBox = (result.minX - marginW) + ' ' + (result.minY - marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
+      var viewBox = (result.minX) + ' ' + (result.minY + marginH) + ' ' + (result.width + marginW) + ' ' + (result.height + marginH);
       return viewBox;
     }
     //Set the view Box
@@ -343,8 +344,10 @@ d3.csv("RegionsBC.csv", function (data) {
 
 //$(window).click((e) => console.log(e.target))  this is to check what is been clicked
 $(function () {
-  var currentRegion;
-  $('svg').on('click','#main path', function(d) {
+
+  $('svg').on('click','path', function() {
+    $('#info-box').slideDown("swing", 4000);
+
     currentRegion = $(this).attr('id');
     d3.selectAll("#main > path")
     .each(function()
@@ -410,7 +413,6 @@ $(function () {
       });
 
 
-
 // Generate labels for charts
 
     g.append("text")
@@ -456,14 +458,16 @@ $(function () {
       return a > 90 ? a - 180 : a;
     }
 
-    $('#info-box').append("<p id='select'>Would you like to hide here?" +
+    if(canSelectRegion){
+    $('#info-box').append("<div id='selectSection'>Hide out here?" +
+        "<br>" +
       "<button class='btn' id='select-btn'>Yes</button>" +
-    "</p>");
+    "</div>");}
 
 //Generate infobox
     function infoBox(d, population, density, hospitals){
       $('#info-box').html( function(){
-          return "<h3>"+d+"</h3>"+
+          return "<h1>"+d+"</h1>"+
           "<ul id='infoList'>"+
             "<li><strong>Population: </strong>" +population+ "</li>"+
             "<li><strong>Population Density:</strong> " +density+" per km<sup>2</li>"+
@@ -475,8 +479,6 @@ $(function () {
     }
 
   });
-
-
 
   //Start Game
   $("#info-box").on("click","#select-btn", function(){
@@ -583,5 +585,20 @@ $(function () {
     //Run the game!!
     infect();
   })
+
+
+  //Animate color
+  function animate(record){
+    Object.keys(regionsData).forEach(
+      function(region){
+        var infectedRegion = this[region];
+        if(infectedRegion.infectStatus){
+          $("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
+        } else {
+          $("#"+ region).css({"fill": "#FFFFFF", "fill-opacity": 100});
+        }
+      }
+      , record)
+  }
 
 });
