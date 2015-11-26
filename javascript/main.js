@@ -12,16 +12,23 @@ $(document).ready(function() {
   $('g').not("#main").attr("style","display: none");
 
   $('.tgl.tgl-flat').on('click', function(){
-    var self = $(this).data("toggle");
-    $(".tgl.tgl-flat").not(this).prop("checked", false);
-
+    //debugger
+    if ($(this).prop("checked") === true) {
+      //debugger
+      var self = $(this).data("toggle");
+      $(".tgl.tgl-flat").not(this).prop("checked", false);
+      redraw(self);
+    } else {
+      redraw("white");
+      $(this).prop("checked", false)
+    }
     //calling d3 method from above to move selected canvas to front
-    var sel = d3.select(self);
-    sel.moveToFront();
+    //var sel = d3.select(self);
+    //sel.moveToFront();
 
-    $(self).toggle(1000, function(){
-      $(self).siblings().not("#main").attr("style","display: none");
-    });
+    //$(self).toggle(1000, function(){
+    //  $(self).siblings().not("#main").attr("style","display: none");
+    //});
   });
 
 // Toggle filter and header
