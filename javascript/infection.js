@@ -12,7 +12,7 @@ $(function() {
   $("#info-box").on("click","#select-btn", function() {
 
     canSelectRegion = false;
-    $("#selectSection").remove();
+    $("#selectSection").hide();
 
     $("#side-nav").slideUp("fast");
     var board = $("<div>").css({
@@ -82,14 +82,15 @@ $(function() {
     function checkSurvival(region, day) {
 
       var infectLevel = region.infectDegree; //always increasing
-      var survivalRate = region.survivalrate; //always decreasing
+      var survivalRate = parseFloat(region.survivalrate); //always decreasing
       var maxSurvive = 100;
-      var minSurvive = infectLevel + day * 1.5; //gets harder to survive as time passes
+      var minSurvive = infectLevel;// + day*1.5; //gets harder to survive as time passes
 
       if (randomSurvival(survivalRate, maxSurvive) > minSurvive) { //rolls to check to see if user is alive
         return true;
       } else {
         deathDate = day;
+        debugger
         return false;
       }
     }
@@ -169,6 +170,7 @@ $(function() {
     displayMessage(0);
 
 
+
     //Game Logic
     function infect() {
 
@@ -220,7 +222,28 @@ $(function() {
       if (!survivorsLeft() || day === 28) {
         console.log('Finish');
         selectEnding(userAlive, deathDate);
+        $("#info-box").append("<div id='restartButton'>Restart?" +
+          "<br>" +
+          "<button class='btn' id='restart-btn'>Restart</button>" +
+          "</div>");
         canSelectRegion = true;
+
+        $('#restart-btn').on('click',function(){
+          //debugger
+          $(".tgl.tgl-flat").prop("checked", false);
+          $('#slider-box').remove();
+          $('#restartButton').remove();
+          for (key in regionsData) {
+            regionsData[key].infectStatus = false;
+            regionsData[key].infectDegree = 0;
+          }
+          day = 0;
+          infectionHistory = [];
+          mapJ.selectAll("path").style("fill", "white");
+          $("#board").remove();
+          $("#selectSection").show();
+          $("#side-nav").slideDown("fast");
+        });
 
         //Slider Show on Completion
         $('#slider').show();
@@ -235,6 +258,7 @@ $(function() {
         infect();
       }, 500);
     }
+
 
     //Slider change animation of day
     $('body').on('input', '#slider', function () {
