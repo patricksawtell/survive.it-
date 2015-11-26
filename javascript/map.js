@@ -115,7 +115,7 @@ d3.csv("RegionsBC.csv", function (data) {
 
     var toolTip =   function tooltipHtml(d, survivalrate){
       return "<h4>"+d+"</h4><table>"+
-        "<tr><td>Survival Rate</td><td>"+survivalrate+"</td></tr>"+
+        "<tr><td>Survival Rate: </td><td>"+survivalrate+" %</td></tr>"+
         "</table>";
     };
     toolTip();
@@ -560,4 +560,3 @@ $(function () {
     }
   });
 });
-

@@ -144,7 +144,7 @@ polyline {
   text-align: center;
   padding: 20px;
   margin: 10px;
-  font: 15px sans-serif;
+  font: 18px sans-serif;
   background: lightsteelblue;
   border: 1px;
   border-radius: 2px;
@@ -152,13 +152,13 @@ polyline {
 
 #tooltip h4 {
   margin: 0;
-  font-size: 14px; }
+  font-size: 20px; }
 
 #tooltip {
   background: rgba(0, 0, 0, 0.9);
   border: 1px solid grey;
   border-radius: 5px;
-  font-size: 15px;
+  font-size: 18px;
   width: auto;
   padding: 4px;
   color: white;
@@ -172,7 +172,7 @@ polyline {
   margin: 0; }
 
 #tooltip tr td:nth-child(1) {
-  width: 50px; }
+  width: 60px; }
 
 #tooltip tr td:nth-child(2) {
   text-align: center; }
@@ -267,7 +267,8 @@ body {
   top: 50px; }
 
 #select-btn {
-  width: 200px; }
+  width: 200px;
+  font-size: 30px; }
 
 #restartButton {
   text-align: center;

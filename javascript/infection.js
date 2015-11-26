@@ -101,11 +101,11 @@ $(function() {
     }
 
     //provide ending
-    function selectEnding(userAlive, deathDate) {
-      if (userAlive) {
-        $("#board").append("<p> simulation ends, user is alive! </p>");
+    function selectEnding(userAlive, deathDate){
+      if (userAlive){
+        $("#board").append("<p>The infection was contained. You survived!! </p>");
       } else {
-        $("#board").append("<p>simulation ends, unfortunately user was dead on day " + deathDate + "</p>");
+        $("#board").append("<p><strong><font color = '#df173f'>BC has been overun! You only made it to day " + deathDate + "</strong></p>");
       }
     }
 
