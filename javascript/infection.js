@@ -5,14 +5,15 @@ $(function() {
 
 
   //Slider hide on load
-    $('#slider').hide();
-    var day = 0;
+  $('#slider').hide();
+  $("h4").text("Infection Day" + " 0");
+  var day = 0;
 
   //Start Game
-  $("#info-box").on("click","#select-btn", function(){
+  $("#info-box").on("click","#select-btn", function() {
 
     canSelectRegion = false;
-    $("#selectSection").remove();
+    $("#selectSection").hide();
 
     $("#side-nav").slideUp("fast");
     var board = $("<div>").css({
@@ -22,13 +23,15 @@ $(function() {
       "height": "500px",
       "margin": "10px auto",
       "overflow-y": "scroll"
-    }).attr("id", "board");
+    }).attr("id", "board")
     $("#side").append(board);
 
 
     //randomizer for starting location
-    var array = $.map(regionsData, function(value, index) {return index});
-    var ind = Math.floor(Math.random()*(29)+1);
+    var array = $.map(regionsData, function (value, index) {
+      return index
+    });
+    var ind = Math.floor(Math.random() * (29) + 1);
     var startRegion = array[ind];
     regionsData[startRegion].infectStatus = true;
     regionsData[startRegion].direction = "center";
@@ -36,16 +39,18 @@ $(function() {
     //When outbreak spread, you need to find the neighbours without being infected yet
     function getCurrentNeighbors(region) {
       var neighbours = neighborNames[region];
-      return neighbours.filter(function(name) {
+      return neighbours.filter(function (name) {
         return !regionsData[name].infectStatus;
       });
     }
+
     //Make sure the game could stop looping when there is no more survivor
-    function survivorsLeft(){
+    function survivorsLeft() {
       return Object.keys(regionsData).some(function (key) {
         return this[key].infectDegree < 100;
       }, regionsData);
     }
+
     // Add infectDegree to infectStatus true regions + Spread outbreak to neighbours
     function propagate(infectedRegionKey) {
       var infectedRegion = this[infectedRegionKey];
@@ -57,37 +62,42 @@ $(function() {
       }
       if (infectedRegion.infectDegree > infectionThreshold) {
         var neighbourList = getCurrentNeighbors(infectedRegionKey);
+
         function notInfectedNeighbourFilter(neighbour) {
           return !this[neighbour].infectStatus;
         }
+
         function infectNeighbour(neighbour) {
           this[neighbour].infectStatus = true;
           this[neighbour].direction = neighborDirection[infectedRegionKey][neighbour];
         }
+
         neighbourList.filter(notInfectedNeighbourFilter, this).forEach(infectNeighbour, this);
       }
     }
+
     // User survival related logic
     var userAlive = true;
     var deathDate;
 
-    function checkSurvival(region, day){
+    function checkSurvival(region, day) {
 
       var infectLevel = region.infectDegree; //always increasing
-      var survivalRate = region.survivalrate; //always decreasing
+      var survivalRate = parseFloat(region.survivalrate); //always decreasing
       var maxSurvive = 100;
-      var minSurvive = infectLevel + day*1.5; //gets harder to survive as time passes
+      var minSurvive = infectLevel;// + day*1.5; //gets harder to survive as time passes
 
-      if (randomSurvival(survivalRate,maxSurvive) > minSurvive ){ //rolls to check to see if user is alive
+      if (randomSurvival(survivalRate, maxSurvive) > minSurvive) { //rolls to check to see if user is alive
         return true;
       } else {
         deathDate = day;
+        //debugger
         return false;
       }
     }
 
-    function randomSurvival(min,max) {
-      return Math.floor(Math.random()*(max-min+1)+min);
+    function randomSurvival(min, max) {
+      return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     //provide ending
@@ -100,8 +110,8 @@ $(function() {
     }
 
     //infection increment function
-    function infectionIncrement(region){
-      return Math.log(region.population)+Math.log(region.density)+region.infectDegree*0.02//-region.hospitals
+    function infectionIncrement(region) {
+      return Math.log(region.population) + Math.log(region.density) + region.infectDegree * 0.02//-region.hospitals
     }
 
     //Animate color
@@ -113,12 +123,12 @@ $(function() {
             var degree = infectedRegion.infectDegree;
             var colorBA = 255 / 100;
             var colorNum = Math.round(255 - colorBA * degree);
-            var rgb = "rgb(255," + colorNum + "," + colorNum+ ")";
+            var rgb = "rgb(255," + colorNum + "," + colorNum + ")";
             $("#" + region).css({"fill": rgb});
           } else {
-          $("#"+ region).css({"fill": "#FFFFFF"});
-        }
-      }, record)
+            $("#" + region).css({"fill": "#FFFFFF"});
+          }
+        }, record)
     }
 
     function displayMessage(day) {
@@ -128,23 +138,25 @@ $(function() {
 
       $("#board").append("<p><strong>Day: " + day + "</strong></p>");
 
-      if(day > 0) {
+      if (day > 0) {
         function isNewInfected(region) {
-          return !infectionHistory[day-1][region].infectStatus;
+          return !infectionHistory[day - 1][region].infectStatus;
         }
+
         infectedRegions.forEach(function (region) {
+
           if (isNewInfected(region)){
             var regionName = region.split("_").join(" ");
           var degree = Math.round(infectionHistory[day][region].infectDegree);
           $("#board").append("<p> <font color='#7CCC63'>" + regionName + " is infected!</p>");
           }});
       }
-      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 1000);
+      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 500);
     }
 
     //Take snapshot of 0 day
     infectionHistory[0] = {};
-    Object.keys(regionsData).forEach(function(region){
+    Object.keys(regionsData).forEach(function (region) {
       infectionHistory[0][region] = {};
       infectionHistory[0][region]["infecStatus"] = regionsData[region]["infectStatus"];
       infectionHistory[0][region]["infectDegree"] = regionsData[region]["infectDegree"];
@@ -158,8 +170,6 @@ $(function() {
 
     displayMessage(0);
 
-
-
     //Game Logic
     function infect() {
 
@@ -170,12 +180,13 @@ $(function() {
 
 
       //Slider output current day position of slider
-      $('body').on('input', '#slider', function() {
+      $('body').on('input', '#slider', function () {
         console.log('current value: ', $(this).val());
       });
 
       //1. Start a new day
       ++day;
+      $("h4").text("Infection Day" + " " + day);
       $('#slider').attr('max', day);
       infectionHistory[day] = {};
       console.log("day ", day);
@@ -199,40 +210,65 @@ $(function() {
       animate(infectionHistory[day]);
 
       //4.5 check user survival
-      if (userAlive === true){
+      if (userAlive === true) {
         userAlive = checkSurvival(regionsData[currentRegion], day)
       }
 
+
+      //6. Display game message
+      displayMessage(day);
+
       //5. if every regions is been infected, to 100 then game stop
-      if ( !survivorsLeft() || day === 28) {
+      if (!survivorsLeft() || day === 28) {
         console.log('Finish');
-        selectEnding(userAlive,deathDate);
-        canSelectRegion = true;
+        selectEnding(userAlive, deathDate);
+        $("#side").append("<div id='restartButton'>Restart?" +
+          "<br>" +
+          "<button class='btn' id='restart-btn'>Restart</button>" +
+          "</div>");
+
+        $('#restart-btn').on('click',function(){
+          $("h4").text("Infection Day" + " 0");
+          canSelectRegion = true;
+          $(".tgl.tgl-flat").prop("checked", false);
+          $('#slider-box').hide();
+          $('#restartButton').remove();
+          for (key in regionsData) {
+            regionsData[key].infectStatus = false;
+            regionsData[key].infectDegree = 0;
+          }
+          day = 0;
+          infectionHistory = [];
+          mapJ.selectAll("path").style("fill", "white");
+          $("#board").remove();
+          $("#selectSection").show();
+          $("#side-nav").slideDown("fast");
+        });
 
         //Slider Show on Completion
+        $('#slider-box').show();
         $('#slider').show();
         $('#slider').val(28);
         return;
       }
 
 
-      //6. Display game message
-          displayMessage(day);
 
       //7. Run next day
-      setTimeout(function() {
+      setTimeout(function () {
         infect();
-      }, 1000);
+      }, 500);
     }
 
+
     //Slider change animation of day
-    $('body').on('input', '#slider', function() {
+    $('body').on('input', '#slider', function () {
       animate(infectionHistory[$(this).val()]);
       console.log(infectionHistory);
     });
 
     //Slider dynamic Day
-    $("input").on("input", function(){
+    $("input").on("input", function () {
       $("h4").text("Infection Day" + " " + $(this).val());
     });
 

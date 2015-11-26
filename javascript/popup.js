@@ -43,15 +43,15 @@ $(document).ready(function() {
   function showDialogue(){
     $('#popupfoot').hide()
     $('.typist').typist({ speed: 12 })
-    .typistPause(2000) // 2 sec
+    .typistPause(1000) // 2 sec
     .typistAdd('Hello?\n')
-    .typistPause(2000) // 2 sec
+    .typistPause(1000) // 2 sec
     .typistAdd('Are you there?\n')
-    .typistPause(2000) // 2 sec
+    .typistPause(1000) // 2 sec
     .typistAdd('Something is wrong!!!!\n')
-    .typistPause(2000) // 2 sec
+    .typistPause(1000) // 2 sec
     .typistAdd('The dead...are alive again!\n')
-    .typistPause(2000) // 2 sec
+    .typistPause(1000) // 2 sec
     .typistAdd('They\'re after us!\n',
     function() {
     $('#popupfoot').fadeIn("slow");

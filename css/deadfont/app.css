@@ -110,7 +110,7 @@ li.toggle {
 
 #boxes #dialog {
   height: 150px;
-  width: 450px;
+  width: 350px;
   padding: 10px;
   font-size: 35px;
   color: white; }
@@ -118,7 +118,8 @@ li.toggle {
 #popupfoot {
   font-size: 16pt;
   position: relative;
-  bottom: 0px; }
+  bottom: 0px;
+  width: 300px; }
 
 path {
   fill: white;
@@ -265,14 +266,6 @@ body {
   top: 50px; }
 
 #select-btn {
-  width: 200px; }
-
-#restartButton {
-  text-align: center;
-  position: relative;
-  top: 50px; }
-
-#restart-btn {
   width: 200px; }
 
 #infoList {
