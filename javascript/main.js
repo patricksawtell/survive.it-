@@ -10,7 +10,6 @@ $(document).ready(function() {
   };
 //setting default svg status
   $('g').not("#main").attr("style","display: none");
-  $("#background").attr("style","display: inherit");
 
   $('.tgl.tgl-flat').on('click', function(){
     var self = $(this).data("toggle");
@@ -24,11 +23,4 @@ $(document).ready(function() {
       $(self).siblings().not("#main").attr("style","display: none");
     });
   });
-
-// Toggle filter and header
-  $('p #select-btn').on('click', function(){
-    $("#side-nav").css("visibility", "hidden");
-    $(".header").slideUp("slow");
-  })
-
 });
