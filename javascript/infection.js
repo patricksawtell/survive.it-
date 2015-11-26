@@ -151,7 +151,7 @@ $(function() {
           $("#board").append("<p> <font color='#7CCC63'>" + regionName + " is infected!</p>");
           }});
       }
-      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 1000);
+      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 500);
     }
 
     //Take snapshot of 0 day
@@ -222,24 +222,12 @@ $(function() {
       if (!survivorsLeft() || day === 28) {
         console.log('Finish');
         selectEnding(userAlive, deathDate);
-        $("#info-box").append("<div id='restartButton'>Restart?" +
+        $("#side").append("<div id='restartButton'>Restart?" +
           "<br>" +
           "<button class='btn' id='restart-btn'>Restart</button>" +
           "</div>");
 
-        //$("#main").attr('disabled', 'disabled');
-        //var event = $(document).click(function(e) {
-        //  e.stopPropagation();
-        //  e.preventDefault();
-        //  e.stopImmediatePropagation();
-        //  return false;
-        //});
-
-
-
         $('#restart-btn').on('click',function(){
-          //debugger
-          //$("#main").removeAttr('disabled');
           $("h4").text("Infection Day" + " 0");
           canSelectRegion = true;
           $(".tgl.tgl-flat").prop("checked", false);

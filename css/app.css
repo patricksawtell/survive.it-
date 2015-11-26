@@ -110,7 +110,7 @@ li.toggle {
 
 #boxes #dialog {
   height: 150px;
-  width: 350px;
+  width: 450px;
   padding: 10px;
   font-size: 35px;
   color: white; }
@@ -118,8 +118,7 @@ li.toggle {
 #popupfoot {
   font-size: 16pt;
   position: relative;
-  bottom: 0px;
-  width: 300px; }
+  bottom: 0px; }
 
 path {
   fill: white;
