@@ -532,7 +532,6 @@ $(function () {
              "<li><span id='deer'></span> Deer <span id='goats'></span> Mountain Goats</li>";
       });
     }
-
   });
 });
 
