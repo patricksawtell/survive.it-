@@ -5,6 +5,8 @@ var svg = d3.select("#map")
   .append("svg")
   .attr("width", width)
   .attr("height", height);
+  //Hide Slider on load
+  $('#slider').hide();
 
 
 var mapJ = svg.append("g").attr("id", "main");
@@ -473,4 +475,21 @@ $(function () {
     }
 
   });
+  
+
+  //Animate color
+  function animate(record){
+    Object.keys(regionsData).forEach(
+      function(region){
+        var infectedRegion = this[region];
+        if(infectedRegion.infectStatus){
+          $("#"+ region).css({"fill": "#FF0000", "fill-opacity": infectedRegion.infectDegree / 100});
+        } else {
+          $("#"+ region).css({"fill": "#FFFFFF", "fill-opacity": 100});
+        }
+      }
+      , record)
+  }
+
+
 });

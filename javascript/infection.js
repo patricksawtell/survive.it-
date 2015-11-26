@@ -3,6 +3,11 @@
  */
 $(function() {
 
+
+  //Slider hide on load
+    $('#slider').hide();
+    var day = 0;
+
   //Start Game
   $("#info-box").on("click","#select-btn", function(){
     $("#side-nav").slideUp("fast");
@@ -16,7 +21,6 @@ $(function() {
       "overflow-y": "scroll"
     }).attr("id", "board");
     $("#side").append(board);
-    var day = 0;
 
 
     //randomizer for starting location
@@ -108,9 +112,10 @@ $(function() {
             var colorNum = Math.round(255 - colorBA * degree);
             var rgb = "rgb(255," + colorNum + "," + colorNum+ ")";
             $("#" + region).css({"fill": rgb});
-          }
+          } else {
+          $("#"+ region).css({"fill": "#FFFFFF"});
         }
-        , record)
+      }, record)
     }
 
     function displayMessage(day) {
@@ -154,8 +159,21 @@ $(function() {
 
     //Game Logic
     function infect() {
+
+      //Slider DAY update 
+      var def = d3.select("svg")
+      .append("defs")
+      .attr("class","animate");
+     
+
+      //Slider output current day position of slider
+      $('body').on('input', '#slider', function() {
+        console.log('current value: ', $(this).val());
+      });
+
       //1. Start a new day
       ++day;
+      $('#slider').attr('max', day);
       infectionHistory[day] = {};
       console.log("day ", day);
       //2. Run propagation to the regions with true infectStatus
@@ -186,8 +204,13 @@ $(function() {
       if ( !survivorsLeft() || day === 28) {
         console.log('Finish');
         selectEnding(userAlive,deathDate);
+
+        //Slider Show on Completion
+        $('#slider').show();
+        $('#slider').val(28);
         return;
       }
+      
 
       //6. Display game message
           displayMessage(day);
@@ -197,6 +220,18 @@ $(function() {
         infect();
       }, 1000);
     }
+
+    //Slider change animation of day
+    $('body').on('input', '#slider', function() {
+      animate(infectionHistory[$(this).val()]);
+      console.log(infectionHistory);
+    });
+
+    //Slider dynamic Day
+    $("input").on("input", function(){
+      $("h4").text("Infection Day" + " " + $(this).val());
+    });
+
     //Run the game!!
     infect();
   });

@@ -11,6 +11,7 @@
 	<!--<script src="liquid.js"></script>-->
 	<script src="node_modules/gsap/src/minified/TweenLite.min.js"></script>
 	<script src="node_modules/gsap/src/minified/plugins/CSSPlugin.min.js"></script>
+
 	<style>
 		path {
 			fill: white;
@@ -366,6 +367,7 @@
 		var def = d3.select("svg")
 			.append("defs")
 			.attr("class","animate");
+			$('#slider').attr('max', day);
 
 		$('body').on('input', '#slider', function() {
 			console.log('current value: ', $(this).val());
@@ -472,10 +474,23 @@
 				setTimeout(function() {
 					infect();
 				}, 1000);
+
+				removeInfection
+
+
+				$('input#slider').change(function(e) {
+					e.stopPropagation();
+					var day = parseInt($(this).val()) -1;
+					var infectedDay = propagationData[day];
+					//instead of displayInfection -> removeInfection
+					// displayInfection(infectedDay, day, propagationData);
+					removeInfection(infectionHistory, day);
+				});
 			}
 			infect();
 		});
 	});
 </script>
+	<input id="slider" type="range" min="1" max="9" step="1"/>
 </body>
 </html>
