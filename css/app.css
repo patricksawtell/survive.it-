@@ -27,7 +27,6 @@ html {
 
 .btn-home {
   padding: 5px;
-  font-size: 15px;
   display: inline-block;
   color: white; }
 
@@ -125,27 +124,19 @@ li.toggle {
 path {
   fill: white;
   stroke: black;
-  stroke-width: 2px;
   font-size: 20px;
   font-weight: 300;
   text-anchor: middle; }
-
-path:hover {
-  stroke: white; }
-
-path.slice {
-  stroke-width: 2px; }
-
-path.zoom {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  transform: scale(1.1);
-  color: yellow; }
 
 polyline {
   opacity: 0.3;
   stroke: black;
   stroke-width: 2px;
   fill: none; }
+
+.region:hover {
+  fill: orange;
+  box-shadow: 1px 0px 20px red; }
 
 #tooltip {
   position: absolute;
@@ -191,7 +182,8 @@ polyline {
 body {
   font: 100% font-stack;
   color: white;
-  background: black; }
+  background: black;
+  font-size: 18px; }
 
 .container {
   max-width: 100%;
@@ -216,15 +208,6 @@ body {
   .main:last-child {
     margin-right: 0; }
 
-.header {
-  float: left;
-  display: block;
-  margin-right: 2.35765%;
-  width: 100%;
-  margin-bottom: 4px; }
-  .header:last-child {
-    margin-right: 0; }
-
 #map {
   float: left;
   display: block;
@@ -247,6 +230,7 @@ body {
 #side-nav {
   border: solid 1px white;
   border-radius: 10px;
+  font-size: 18px;
   background: rgba(54, 25, 25, 0.5);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
   #side-nav .tg-list .tg-list-item {
@@ -270,10 +254,14 @@ body {
   #info-box:last-child {
     margin-right: 0; }
 
+#infoList {
+  float: left; }
+
 #filter {
   text-align: center;
   color: #e74c3c;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3); }
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  font-size: 30px; }
 
 #clouds {
   height: 500px;
@@ -294,5 +282,48 @@ body {
 
 #city-select {
   visibility: hidden; }
+
+h3 {
+  color: #e74c3c;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  font-size: 25px; }
+
+#legend {
+  margin-top: 7px;
+  margin-bottom: 10px;
+  float: left; }
+
+#bears {
+  background: #65b6aa;
+  height: 15px;
+  width: 15px;
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle; }
+
+#deer {
+  background: #5b7d8d;
+  height: 15px;
+  width: 15px;
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle; }
+
+#caribou {
+  background: #add4a3;
+  height: 15px;
+  width: 15px;
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle; }
+
+#goats {
+  background: #4f2958;
+  height: 15px;
+  width: 15px;
+  display: inline-block;
+  margin: 2px;
+  margin-left: 8px;
+  vertical-align: middle; }
 
 /*# sourceMappingURL=app.css.map */
