@@ -7,6 +7,7 @@ $(function() {
   $('#slider').hide();
   $("h4").text("Infection Day" + " 0");
   var day = 0;
+  var dayDuration = 500;
 
   //Start Game
   $("#info-box").on("click","#select-btn", function() {
@@ -119,7 +120,7 @@ $(function() {
             var colorBA = 255 / 100;
             var colorNum = Math.round(255 - colorBA * degree);
             var rgb = "rgb(255," + colorNum + "," + colorNum + ")";
-            $("#" + region).css({"fill": rgb});
+            d3.select('#' + region).transition().ease("linear").duration(dayDuration).style('fill', rgb);
           } else {
             $("#" + region).css({"fill": "#FFFFFF"});
           }
@@ -146,7 +147,7 @@ $(function() {
           $("#board").append("<p> <font color='#7CCC63'>" + regionName + " is infected!</p>");
           }});
       }
-      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, 500);
+      $("#board").animate({scrollTop: $("#board")[0].scrollHeight}, dayDuration);
     }
 
     //Take snapshot of 0 day
@@ -247,7 +248,7 @@ $(function() {
       //7. Run next day
       setTimeout(function () {
         infect();
-      }, 500);
+      }, dayDuration);
     }
 
 
